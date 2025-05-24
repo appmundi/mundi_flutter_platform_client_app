@@ -5,6 +5,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/helpers/environments.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/extension/size_screen_extension.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/colors_app.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/text_styles.dart';
@@ -78,18 +79,18 @@ class _EntrepreneurPageState extends State<EntrepreneurPage>
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(2),
                         ),
-                        child:
-                            state.entrepreneur?.profileImage != null
-                                ? Image.memory(
-                                  state.entrepreneur!.profileImage!,
-                                  fit: BoxFit.cover,
-                                )
-                                : Center(
-                                  child: Image.asset(
-                                    'assets/images/dark_logo.png',
-                                    fit: BoxFit.cover,
-                                  ),
-                                ),
+                        child: Image.network(
+                          '${Environments.get('BASE_URL')}/images/profile/${state.entrepreneur?.id}',
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Center(
+                              child: Image.asset(
+                                'assets/images/dark_logo.png',
+                                fit: BoxFit.cover,
+                              ),
+                            );
+                          },
+                        ),
                       ),
                       Align(
                         alignment: Alignment.topLeft,

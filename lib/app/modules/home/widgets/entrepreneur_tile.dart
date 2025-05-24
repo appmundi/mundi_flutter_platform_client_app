@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/helpers/environments.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/text_styles.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/entrepreneur.dart';
 
@@ -17,7 +18,6 @@ class EntrepreneurTile extends StatefulWidget {
 }
 
 class _EntrepreneurTileState extends State<EntrepreneurTile> {
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -26,26 +26,20 @@ class _EntrepreneurTileState extends State<EntrepreneurTile> {
         Container(
           width: 275,
           height: 152,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(6),
-          ),
+          decoration: BoxDecoration(borderRadius: BorderRadius.circular(6)),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(6),
-            child: widget.entrepreneur.profileImage != null
-                ? Image.memory(
-              widget.entrepreneur.profileImage!,
+            child: Image.network(
+              '${Environments.get('BASE_URL')}/images/profile/${widget.entrepreneur.id}',
               fit: BoxFit.cover,
-            )
-                : Image.asset(
-              'assets/images/dark_logo.png',
-
+              errorBuilder: (context, error, stackTrace) {
+                return Image.asset('assets/images/dark_logo.png');
+              },
             ),
           ),
         ),
 
-        const SizedBox(
-          height: 5,
-        ),
+        const SizedBox(height: 5),
         Text(
           widget.entrepreneur.name,
           style: context.textStyles.titleBold.copyWith(
@@ -53,9 +47,7 @@ class _EntrepreneurTileState extends State<EntrepreneurTile> {
             fontSize: 16,
           ),
         ),
-        const SizedBox(
-          height: 5,
-        ),
+        const SizedBox(height: 5),
         Text(
           widget.entrepreneur.fullAddress,
           style: context.textStyles.textRegular.copyWith(
