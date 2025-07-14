@@ -18,6 +18,7 @@ class ReserveRepository implements IReserveRepository {
     required String scheduledDate,
     required List<int> modalityIds,
     required String description,
+    Map<String, String>? address,
   }) async {
     final response = await rest.post(
       "/scheduling/schedule",
@@ -27,6 +28,7 @@ class ReserveRepository implements IReserveRepository {
         "modalityIds": modalityIds,
         "status": "INIT",
         "description": description,
+        "address": address,
       },
       headers: {
         'Content-Type': 'application/json',

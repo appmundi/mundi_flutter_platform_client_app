@@ -32,7 +32,7 @@ class _ReserveTileState extends State<ReserveTile> {
       if (minute < 60) {
         endsAt = "${hour}h${minute.toString().padLeft(2, "0")}";
       } else {
-        endsAt = minute == 60 ? "${hour}h" : "${hour + 1}h${minute - 60}";
+        endsAt = minute == 60 ? "${hour + 1}h" : "${hour + 1}h${minute - 60}";
       }
     } catch (e) {}
     setState(() {});

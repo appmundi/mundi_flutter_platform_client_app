@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/extension/date_time_extension.dart';
@@ -49,6 +50,11 @@ class ReservePage extends StatefulWidget {
 class _ReservePageState extends State<ReservePage> with Messages<ReservePage> {
   final descriptionController = TextEditingController();
 
+  // Controladores para os campos de endereço
+  final zipCodeController = TextEditingController();
+  final numberController = TextEditingController();
+  final complementController = TextEditingController();
+
   late final _dateController = DateRangePickerController();
   List<String> availablesTimes = [];
   String selectedTime = '';
@@ -78,13 +84,13 @@ class _ReservePageState extends State<ReservePage> with Messages<ReservePage> {
 
   void onAddModalities() async {
     final addedModalities =
-        await showDialog(
-              context: context,
-              builder: (context) {
-                return AddServicesDialog(entrepreneur: entrepreneur);
-              },
-            )
-            as List<Modality>?;
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AddServicesDialog(entrepreneur: entrepreneur);
+      },
+    )
+    as List<Modality>?;
     if (addedModalities == null) {
       return;
     }
@@ -198,6 +204,134 @@ class _ReservePageState extends State<ReservePage> with Messages<ReservePage> {
     );
   }
 
+// Substitua o método _buildAddressFields() por este:
+  Widget _buildAddressFields() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          "Endereço do atendimento",
+          style: context.textStyles.titleBold.copyWith(
+            fontSize: 16,
+            color: context.colors.primary,
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // CEP e Número na mesma linha
+        Row(
+          children: [
+            Expanded(
+              flex: 2,
+              child: _buildAddressTextField(
+                label: "CEP *",
+                hintText: "00000-000",
+                controller: zipCodeController,
+                formatters: [
+                  FilteringTextInputFormatter.digitsOnly,
+                  LengthLimitingTextInputFormatter(8),
+                ],
+              ),
+            ),
+            const SizedBox(width: 15),
+            Expanded(
+              flex: 1,
+              child: _buildAddressTextField(
+                label: "Número *",
+                hintText: "Nº",
+                controller: numberController,
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 15),
+
+        // Complemento
+        _buildAddressTextField(
+          label: "Complemento",
+          hintText: "Apto, bloco, casa, etc. (opcional)",
+          controller: complementController,
+        ),
+        const SizedBox(height: 25),
+      ],
+    );
+  }
+
+  bool _validateAddressFields() {
+    if (!entrepreneur.optionwork) return true;
+
+    bool isValid = true;
+
+    if (zipCodeController.text.trim().isEmpty) {
+      showError("CEP é obrigatório");
+      isValid = false;
+    } else if (zipCodeController.text.trim().length < 8) {
+      showError("CEP deve ter 8 dígitos");
+      isValid = false;
+    }
+
+    if (numberController.text.trim().isEmpty) {
+      showError("Número é obrigatório");
+      isValid = false;
+    }
+
+    return isValid;
+  }
+
+
+  Widget _buildAddressTextField({
+    required String label,
+    required String hintText,
+    required TextEditingController controller,
+    List<TextInputFormatter>? formatters,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: context.textStyles.titleBold.copyWith(
+            fontSize: 10,
+            color: context.colors.darkGrey,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          decoration: BoxDecoration(
+            border: Border.all(color: context.colors.secondary, width: .5),
+            borderRadius: BorderRadius.circular(15),
+          ),
+          height: 45,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 15.0),
+            child: TextField(
+              controller: controller,
+              inputFormatters: formatters,
+              style: context.textStyles.textRegular.copyWith(
+                fontSize: 12,
+                color: Colors.black,
+              ),
+              decoration: InputDecoration(
+                border: InputBorder.none,
+                errorBorder: InputBorder.none,
+                enabledBorder: InputBorder.none,
+                focusedBorder: InputBorder.none,
+                disabledBorder: InputBorder.none,
+                focusedErrorBorder: InputBorder.none,
+                hintText: hintText,
+                hintStyle: context.textStyles.textRegular.copyWith(
+                  fontSize: 12,
+                  color: Colors.grey.shade500,
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<ReserveCubit, ReserveState>(
@@ -229,177 +363,186 @@ class _ReservePageState extends State<ReservePage> with Messages<ReservePage> {
       },
       builder:
           (context, state) => Scaffold(
-            resizeToAvoidBottomInset: false,
-            appBar: AppBar(
-              title: Image.asset('assets/images/dark_logo.png', height: 32),
-              automaticallyImplyLeading: false,
-              centerTitle: false,
-            ),
-            body: Stack(
-              children: [
-                SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                    child: Column(
-                      children: [
-                        SizedBox(
-                          height: 30,
-                          child: Center(
-                            child: Row(
-                              children: [
-                                InkWell(
-                                  onTap: () {
-                                    Modular.to.pop();
-                                  },
-                                  child: Icon(
-                                    Icons.arrow_back_ios,
-                                    color: context.colors.secondary,
-                                    size: 20,
-                                  ),
-                                ),
-                                const SizedBox(width: 5),
-                                Text(
-                                  "Fazer uma reserva",
-                                  style: context.textStyles.titleBold.copyWith(
-                                    color: context.colors.primary,
-                                    fontSize: 20,
-                                    height: .7,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        Center(
-                          child: Text(
-                            DateTime.now().year.toString(),
-                            style: context.textStyles.titleBold.copyWith(
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        CalendarPicker(
-                          controller: _dateController,
-                          minDate: DateTime.now(),
-                          onSelectionChanged: (args) {
-                            _loadAvailableTimes();
-                          },
-                        ),
-                        const SizedBox(height: 20),
-                        AvailableTimesInput(
-                          availablesTimes: availablesTimes,
-                          onSelectTime: (time) {
-                            setState(() {
-                              selectedTime = time;
-                            });
-                          },
-                          selectedTime: selectedTime,
-                        ),
-                        const SizedBox(height: 30),
-                        ReserveTile(
-                          modality: widget.reservePageArguments.modality,
-                          selectedTime: selectedTime,
-                          selectedDate: _dateController.selectedDate!,
-                        ),
-                        const SizedBox(height: 30),
-                        GestureDetector(
-                          onTap: onAddModalities,
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Icon(
-                                Icons.add,
-                                size: 25,
-                                color: context.colors.secondary,
-                              ),
-                              _buildAdditionalModalitiesContainer(),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        TextArea(controller: descriptionController),
-                        const SizedBox(height: 80),
-                      ],
-                    ),
-                  ),
-                ),
-                Positioned(
-                  bottom: 0,
-                  child: Container(
-                    width: 1.sw,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20.0,
-                      vertical: 15,
-                    ),
-                    decoration: const BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(15),
-                        topRight: Radius.circular(15),
-                      ),
-                      color: Colors.white,
-                    ),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+        resizeToAvoidBottomInset: false,
+        appBar: AppBar(
+          title: Image.asset('assets/images/dark_logo.png', height: 32),
+          automaticallyImplyLeading: false,
+          centerTitle: false,
+        ),
+        body: Stack(
+          children: [
+            SingleChildScrollView(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      height: 30,
+                      child: Center(
+                        child: Row(
                           children: [
-                            Text(
-                              modalities
-                                  .map((modality) => modality.price)
-                                  .reduce((a, b) => a + b)
-                                  .currency,
-                              style: context.textStyles.titleBold.copyWith(
-                                fontSize: 16,
+                            InkWell(
+                              onTap: () {
+                                Modular.to.pop();
+                              },
+                              child: Icon(
+                                Icons.arrow_back_ios,
+                                color: context.colors.secondary,
+                                size: 20,
                               ),
                             ),
+                            const SizedBox(width: 5),
                             Text(
-                              "${modalities.map((modality) => modality.getDuration()).reduce((a, b) => a + b)} MIN",
+                              "Fazer uma reserva",
                               style: context.textStyles.titleBold.copyWith(
-                                fontWeight: FontWeight.w400,
-                                fontSize: 10,
+                                color: context.colors.primary,
+                                fontSize: 20,
+                                height: .7,
                               ),
                             ),
                           ],
                         ),
-                        AppButton(
-                          width: .43.sw,
-                          text: 'Reservar',
-                          onPressed: () async {
-                            if (selectedTime.isNotEmpty) {
-                              final [hour, minute] =
-                                  selectedTime
-                                      .getHourAndMinuteFromAppTimeFormat;
-                              ReadContext(
-                                context,
-                              ).read<ReserveCubit>().createReserve(
-                                entrepreneurId:
-                                    widget.reservePageArguments.entrepreneurId,
-                                modalityIds:
-                                    modalities
-                                        .map((modality) => modality.id)
-                                        .toList(),
-                                scheduledDate:
-                                    _dateController.selectedDate!
-                                        .fillHourAndMinute(hour, minute)
-                                        .toIso8601String(),
-                                description: descriptionController.text,
-                              );
-                            } else {
-                              showError('Escolha um horário para atendimento!');
-                            }
-                          },
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Center(
+                      child: Text(
+                        DateTime.now().year.toString(),
+                        style: context.textStyles.titleBold.copyWith(
+                          fontSize: 16,
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    CalendarPicker(
+                      controller: _dateController,
+                      minDate: DateTime.now(),
+                      onSelectionChanged: (args) {
+                        _loadAvailableTimes();
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    AvailableTimesInput(
+                      availablesTimes: availablesTimes,
+                      onSelectTime: (time) {
+                        setState(() {
+                          selectedTime = time;
+                        });
+                      },
+                      selectedTime: selectedTime,
+                    ),
+                    const SizedBox(height: 30),
+                    ReserveTile(
+                      modality: widget.reservePageArguments.modality,
+                      selectedTime: selectedTime,
+                      selectedDate: _dateController.selectedDate!,
+                    ),
+                    const SizedBox(height: 30),
+                    GestureDetector(
+                      onTap: onAddModalities,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Icon(
+                            Icons.add,
+                            size: 25,
+                            color: context.colors.secondary,
+                          ),
+                          _buildAdditionalModalitiesContainer(),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Campos de endereço (apenas se entrepreneur.optionwork == 1)
+                    if (entrepreneur.optionwork) ...[
+                      _buildAddressFields(),
+                    ],
+
+                    TextArea(controller: descriptionController),
+                    const SizedBox(height: 80),
+                  ],
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: 0,
+              child: Container(
+                width: 1.sw,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 20.0,
+                  vertical: 15,
+                ),
+                decoration: const BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15),
+                  ),
+                  color: Colors.white,
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          modalities
+                              .map((modality) => modality.price)
+                              .reduce((a, b) => a + b)
+                              .currency,
+                          style: context.textStyles.titleBold.copyWith(
+                            fontSize: 16,
+                          ),
+                        ),
+                        Text(
+                          "${modalities.map((modality) => modality.getDuration()).reduce((a, b) => a + b)} MIN",
+                          style: context.textStyles.titleBold.copyWith(
+                            fontWeight: FontWeight.w400,
+                            fontSize: 10,
+                          ),
                         ),
                       ],
                     ),
-                  ),
+                    AppButton(
+                      width: .43.sw,
+                      text: 'Reservar',
+                      onPressed: () async {
+                        if (selectedTime.isEmpty) {
+                          showError('Escolha um horário para atendimento!');
+                          return;
+                        }
+
+                        if (!_validateAddressFields()) {
+                          return;
+                        }
+
+                        final [hour, minute] =
+                            selectedTime.getHourAndMinuteFromAppTimeFormat;
+
+                        ReadContext(context).read<ReserveCubit>().createReserve(
+                          entrepreneurId: widget.reservePageArguments.entrepreneurId,
+                          modalityIds: modalities.map((modality) => modality.id).toList(),
+                          scheduledDate: _dateController.selectedDate!
+                              .fillHourAndMinute(hour, minute)
+                              .toIso8601String(),
+                          description: descriptionController.text,
+                          address: entrepreneur.optionwork ? {
+                            'number': numberController.text.trim(),
+                            'zipCode': zipCodeController.text.trim(),
+                            'complement': complementController.text.trim(),
+                          } : null,
+                        );
+                      },
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
-          ),
+          ],
+        ),
+      ),
     );
   }
 }

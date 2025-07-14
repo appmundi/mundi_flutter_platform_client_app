@@ -14,6 +14,7 @@ class ReserveCubit extends Cubit<ReserveState> {
     required String scheduledDate,
     required List<int> modalityIds,
     required String description,
+    Map<String, String>? address,
   }) async {
     try {
       emit(state.copyWith(status: ReserveStatus.loading));
@@ -23,6 +24,7 @@ class ReserveCubit extends Cubit<ReserveState> {
         scheduledDate: scheduledDate,
         modalityIds: modalityIds,
         description: description,
+        address: address,
       );
 
       emit(state.copyWith(status: ReserveStatus.success));

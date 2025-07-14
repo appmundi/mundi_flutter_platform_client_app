@@ -20,7 +20,6 @@ class _TextAreaState extends State<TextArea> {
         border: Border.all(color: context.colors.secondary, width: .5),
         borderRadius: BorderRadius.circular(20),
       ),
-      width: .85.sw,
       height: 80,
       child: Stack(
         children: [
@@ -30,7 +29,7 @@ class _TextAreaState extends State<TextArea> {
               controller: widget.controller,
               maxLines: 8,
               style: context.textStyles.textRegular.copyWith(
-                fontSize: 8,
+                fontSize: 10,
                 color: Colors.black,
               ),
               decoration: const InputDecoration(
