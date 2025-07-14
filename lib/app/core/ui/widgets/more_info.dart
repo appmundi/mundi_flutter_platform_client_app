@@ -77,7 +77,7 @@ class MoreInfoModal {
                             ),
                           ),
                           child: Text(
-                            'O profissional que irá reaçozar o seu serviço chegará em',
+                            'O profissional que irá realizar o seu serviço chegará em',
                             style: context.textStyles.textRegular
                                 .copyWith(color: Colors.white, fontSize: 12),
                           ),

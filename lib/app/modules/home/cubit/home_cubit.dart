@@ -50,15 +50,9 @@ class HomeCubit extends Cubit<HomeState> {
     try {
       emit(state.copyWith(status: HomeStateStatus.loading));
 
-      final newList = state.entrepreneurs!.where((Entrepreneur element) {
-        return element.name
-            .toLowerCase()
-            .contains(filterText.toString().toLowerCase());
-      }).toList();
+      final filteredEntrepreneurs = await repository.searchAll(filterText);
 
-      print(newList);
-
-      emit(state.copyWith(filteredEntrepreneurs: newList, status: HomeStateStatus.loaded));
+      emit(state.copyWith(filteredEntrepreneurs: filteredEntrepreneurs, status: HomeStateStatus.loaded));
     } catch (e) {
       state.copyWith(filteredEntrepreneurs: state.entrepreneurs);
     }

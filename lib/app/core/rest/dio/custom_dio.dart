@@ -38,6 +38,9 @@ class CustomDio implements RestClient {
       {Map<String, dynamic>? queryParameters,
       Map<String, dynamic>? headers}) async {
     try {
+      print(path);
+      print(queryParameters);
+      print(headers);
       final response = await _dio.get(
         path,
         queryParameters: queryParameters,

@@ -99,6 +99,7 @@ class _SchedulesPageState extends State<SchedulesPage> {
       userId: profile['id'],
     );
     await context.read<ScheduleCubit>().sendFeedback(feedback);
+    _refreshSchedules();
   }
 
   Future<Map<String, dynamic>> getProfile() async {

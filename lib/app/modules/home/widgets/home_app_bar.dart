@@ -17,7 +17,6 @@ class _HomeAppBarState extends State<HomeAppBar> {
   Widget build(BuildContext context) {
     return Container(
       width: 1.sw,
-      height: .42.sh - 1.statusBar,
       color: const Color(0xFF060E31),
       padding: EdgeInsets.only(top: 1.statusBar + 10),
       child: Column(

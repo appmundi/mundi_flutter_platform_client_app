@@ -117,7 +117,7 @@ class _PageState extends State<Page> {
   @override
   void initState() {
     super.initState();
-    searchController.addListener(_onSearchChanged);
+    // searchController.addListener(_onSearchChanged);
     categoryController.addListener(_onCategoryChanged);
 
   }
@@ -125,16 +125,16 @@ class _PageState extends State<Page> {
 
   @override
   void dispose() {
-    searchController.removeListener(_onSearchChanged);
+    // searchController.removeListener(_onSearchChanged);
     categoryController.removeListener(_onCategoryChanged);
     searchController.dispose();
     categoryController.dispose();
     super.dispose();
   }
 
-  void _onSearchChanged() {
+  void _onSearchChanged(String text) {
     BlocProvider.of<HomeCubit>(context)
-        .applyFilter(searchController.text);
+        .applyFilter(text);
   }
 
   void _onCategoryChanged() {
@@ -148,7 +148,6 @@ class _PageState extends State<Page> {
       children: [
         Container(
           width: 1.sw,
-          height: .24.sh - 1.statusBar,
           color: const Color(0xFF060E31),
           padding: EdgeInsets.only(top: 1.statusBar + 10),
           child: Column(
@@ -165,6 +164,7 @@ class _PageState extends State<Page> {
                 hintText: 'Pesquisa aqui a especialidade...',
                 prefixIcon: Icons.search,
                 controller: searchController,
+                onSubmitted: _onSearchChanged,
                 function: (string) {
                   print("Texto mudou ${string}");
                   searchController.text = string;

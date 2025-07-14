@@ -14,14 +14,15 @@ class EntrepreneurRepository implements IEntrepreneurRepository {
   }) : _rest = rest;
 
   @override
-  Future<List<Entrepreneur>?> searchAll() async {
+  Future<List<Entrepreneur>?> searchAll([String? query]) async {
     try {
       final response = await _rest.get("/entrepreneur/searchAll",headers: {
         'Content-Type': 'application/json',
+      }, queryParameters: {
+        'query': query,
       });
       final entrepreneurs = (response.data as List)
           .map<Entrepreneur>((data){
-            log("Data > ${data}");
        return Entrepreneur.fromMap(data);
       })
           .toList();

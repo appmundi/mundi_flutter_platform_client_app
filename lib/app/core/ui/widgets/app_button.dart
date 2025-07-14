@@ -8,10 +8,12 @@ class AppButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final double? width;
   final bool loading;
+  final double? fontSize;
   const AppButton({
     super.key,
     required this.text,
     required this.onPressed,
+    this.fontSize,
     this.width,
     this.loading = false,
   });
@@ -51,6 +53,7 @@ class AppButton extends StatelessWidget {
               color: onPressed == null
                   ? const Color.fromRGBO(35, 38, 39, .4)
                   : Colors.black,
+              fontSize: fontSize,
             ),
           ),
         ),

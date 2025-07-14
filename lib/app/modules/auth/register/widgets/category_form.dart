@@ -3,6 +3,7 @@ part of '../register_page.dart';
 class _CategoryForm extends StatefulWidget {
   final VoidCallback onSubmit;
   final VoidCallback onReturn;
+
   const _CategoryForm({
     required this.onSubmit,
     required this.onReturn,
@@ -72,9 +73,9 @@ class _CategoryFormState extends State<_CategoryForm> {
             height: 20,
           ),
           Text(
-              "Escolha entre 1 e 3 serviços para exibirmos na sua tela inicial.",
-              style: context.textStyles.textMedium
-                  .copyWith(color: Colors.white, fontSize: 8)),
+            "Escolha entre 1 e 3 serviços para exibirmos na sua tela inicial.",
+            style: context.textStyles.textMedium
+                .copyWith(color: Colors.white, fontSize: 8,),),
           const SizedBox(
             height: 20,
           ),
