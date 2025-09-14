@@ -89,4 +89,24 @@ class CustomDio implements RestClient {
       throw RestClientException.fromDioException(e);
     }
   }
+
+  @override
+  Future<RestClientResponse<T>> delete<T>(
+      String path, {
+        dynamic data,
+        Map<String, dynamic>? queryParameters,
+        Map<String, dynamic>? headers,
+      }) async {
+    try {
+      final response = await _dio.delete(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: Options(headers: headers),
+      );
+      return RestClientResponse<T>.fromDio(response);
+    } on DioException catch (e) {
+      throw RestClientException.fromDioException(e);
+    }
+  }
 }

@@ -58,6 +58,7 @@ class _GradientTextFieldState extends State<GradientTextField> {
       child: TextField(
         controller: widget.controller,
         maxLines: 1,
+        textInputAction: TextInputAction.search,
         onSubmitted: widget.onSubmitted,
         onChanged: (string){
           widget.function!(string);

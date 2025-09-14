@@ -1,7 +1,9 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart' hide Feedback;
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:flutter_modular/flutter_modular.dart'
     hide ModularWatchExtension;
 import 'package:geocoding/geocoding.dart';
@@ -38,32 +40,197 @@ class _SchedulesPageState extends State<SchedulesPage> {
     await context.read<ScheduleCubit>().loadSchedule();
   }
 
-  void abrirWazeOuMaps(double latitude, double longitude) async {
-    final wazeUrl = 'waze://?ll=$latitude,$longitude&navigate=yes';
-    final googleMapsUrl = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
-    final appleMapsUrl = 'http://maps.apple.com/?ll=$latitude,$longitude';
+  // Novo método para mostrar o dialog de seleção de mapas
+  Future<void> _showMapSelectionDialog(double latitude, double longitude) async {
+    final selectedOption = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        // Lista de opções baseada na plataforma
+        final mapOptions = _getMapOptions();
 
-    if (await canLaunchUrl(Uri.parse(wazeUrl))) {
-      await launchUrl(
-        Uri.parse(wazeUrl),
-        mode: LaunchMode.externalApplication,
-      );
-      return;
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Como chegar',
+                  style: context.textStyles.titleBold.copyWith(
+                    fontSize: 18,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 16,
+                  children: mapOptions.map((option) => _buildMapOption(
+                    icon: option['icon'],
+                    label: option['label'],
+                    color: option['color'],
+                    onTap: () => Navigator.of(context).pop(option['type']),
+                  )).toList(),
+                ),
+                const SizedBox(height: 24),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: TextButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  ),
+                  child: Text(
+                    'Cancelar',
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (selectedOption != null) {
+      await _openSelectedMap(selectedOption, latitude, longitude);
+    }
+  }
+
+  // Método para obter as opções de mapa baseado na plataforma
+  List<Map<String, dynamic>> _getMapOptions() {
+    final options = <Map<String, dynamic>>[
+      {
+        'icon': MdiIcons.waze,
+        'label': 'Waze',
+        'color': const Color(0xFF00D4AA),
+        'type': 'waze',
+      },
+      {
+        'icon': MdiIcons.googleMaps,
+        'label': 'Google Maps',
+        'color': const Color(0xFF4285F4),
+        'type': 'google',
+      },
+    ];
+
+    // Adiciona Apple Maps apenas se for iOS
+    if (Platform.isIOS) {
+      options.add({
+        'icon': MdiIcons.apple,
+        'label': 'Apple Maps',
+        'color': const Color(0xFF000000),
+        'type': 'apple',
+      });
     }
 
-    if (await canLaunchUrl(Uri.parse(googleMapsUrl))) {
-      await launchUrl(
-        Uri.parse(googleMapsUrl),
-        mode: LaunchMode.externalApplication,
-      );
-      return;
+    return options;
+  }
+
+  Widget _buildMapOption({
+    required IconData icon,
+    required String label,
+    required Color color,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: 80,
+        height: 80,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.grey[300]!),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              icon,
+              size: 28,
+              color: color,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: Colors.grey[700],
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Método para abrir o mapa selecionado
+  Future<void> _openSelectedMap(String mapType, double latitude, double longitude) async {
+    String url;
+
+    switch (mapType) {
+      case 'waze':
+        url = 'waze://?ll=$latitude,$longitude&navigate=yes';
+        break;
+      case 'google':
+        url = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
+        break;
+      case 'apple':
+        url = 'http://maps.apple.com/?ll=$latitude,$longitude';
+        break;
+      default:
+        return;
     }
 
-    if (await canLaunchUrl(Uri.parse(appleMapsUrl))) {
-      await launchUrl(
-        Uri.parse(appleMapsUrl),
-        mode: LaunchMode.externalApplication,
-      );
+    try {
+      if (await canLaunchUrl(Uri.parse(url))) {
+        await launchUrl(
+          Uri.parse(url),
+          mode: LaunchMode.externalApplication,
+        );
+      } else {
+        // Se o aplicativo não estiver instalado, mostrar mensagem de erro
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Não foi possível abrir o ${_getMapName(mapType)}. Verifique se está instalado.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao abrir o aplicativo de mapas: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
+  }
+
+  // Método auxiliar para obter o nome do aplicativo de mapas
+  String _getMapName(String mapType) {
+    switch (mapType) {
+      case 'waze':
+        return 'Waze';
+      case 'google':
+        return 'Google Maps';
+      case 'apple':
+        return 'Apple Maps';
+      default:
+        return 'aplicativo de mapas';
     }
   }
 
@@ -71,7 +238,7 @@ class _SchedulesPageState extends State<SchedulesPage> {
     if (schedules.isEmpty) return;
 
     final needFeedbackSchedule = schedules.where(
-      (schedule) {
+          (schedule) {
         return schedule.status == 'FEEDBACK';
       },
     ).firstOrNull;
@@ -191,90 +358,90 @@ class _SchedulesPageState extends State<SchedulesPage> {
                     height: 15,
                   ),
 
-                    Visibility(
-                      visible: sortedSchedules.isNotEmpty,
-                      replacement: const Center(
-                        child: Text('Nenhum agendamento encontrado'),
-                      ),
-                      child: Expanded(
-                        child: ListView.separated(
-                          separatorBuilder: (context, index) =>
-                              const SizedBox(height: 10),
-                          physics: const AlwaysScrollableScrollPhysics(),
-                          shrinkWrap: true,
-                          itemCount: sortedSchedules.length,
-                          itemBuilder: (context, index) {
-                            DateTime scheduledDate = DateTime.parse(
-                                sortedSchedules[index].scheduledDate);
+                  Visibility(
+                    visible: sortedSchedules.isNotEmpty,
+                    replacement: const Center(
+                      child: Text('Nenhum agendamento encontrado'),
+                    ),
+                    child: Expanded(
+                      child: ListView.separated(
+                        separatorBuilder: (context, index) =>
+                        const SizedBox(height: 10),
+                        physics: const AlwaysScrollableScrollPhysics(),
+                        shrinkWrap: true,
+                        itemCount: sortedSchedules.length,
+                        itemBuilder: (context, index) {
+                          DateTime scheduledDate = DateTime.parse(
+                              sortedSchedules[index].scheduledDate);
 
-                            final currentDate = DateTime.now();
-                            final currentDateWithoutTime = DateTime(
-                                currentDate.year,
-                                currentDate.month,
-                                currentDate.day);
-                            final scheduledDateWithoutTime = DateTime(
-                                scheduledDate.year,
-                                scheduledDate.month,
-                                scheduledDate.day);
+                          final currentDate = DateTime.now();
+                          final currentDateWithoutTime = DateTime(
+                              currentDate.year,
+                              currentDate.month,
+                              currentDate.day);
+                          final scheduledDateWithoutTime = DateTime(
+                              scheduledDate.year,
+                              scheduledDate.month,
+                              scheduledDate.day);
 
-                            if (!scheduledDateWithoutTime
-                                .isBefore(currentDateWithoutTime)) {
-                              return Column(
-                                children: [
-                                  ReserveTile(
-                                    modality: sortedSchedules[index].modality,
-                                    selectedDate: scheduledDate,
-                                    selectedTime: scheduledDate.appTimeFormat,
-                                  ),
-                                  const SizedBox(height: 7),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      SchedulesOutlineButton(
-                                        onPressed: () {
-                                          MoreInfoModal.show(
-                                            context,
-                                            Reservation(
-                                              entrepreneurId:
-                                                  sortedSchedules[index]
-                                                      .entrepreneurEntrepreneurId,
-                                              userId: sortedSchedules[index]
-                                                  .userUserId,
-                                              modality:
-                                                  sortedSchedules[index].modality,
-                                              startAt: DateTime.parse(
-                                                  sortedSchedules[index]
-                                                      .scheduledDate),
-                                              entrepreneurPhone:
-                                                  sortedSchedules[index]
-                                                      .entrepreneurPhone,
-                                              scheduleId:
-                                                  sortedSchedules[index].id,
-                                            ),
-                                          );
-                                        },
-                                        label: 'Mais informações',
-                                      ),
-                                      SchedulesOutlineButton(
-                                        onPressed: () {
-                                          _getCoordinatesFromAddress(
-                                              sortedSchedules[index].cep);
-                                        },
-                                        label: 'Como chegar',
-                                      ),
-                                    ],
-                                  ),
-                                  const SizedBox(height: 30),
-                                ],
-                              );
-                            } else {
-                              return const Row();
-                            }
-                          },
-                        ),
+                          if (!scheduledDateWithoutTime
+                              .isBefore(currentDateWithoutTime)) {
+                            return Column(
+                              children: [
+                                ReserveTile(
+                                  modality: sortedSchedules[index].modality,
+                                  selectedDate: scheduledDate,
+                                  selectedTime: scheduledDate.appTimeFormat,
+                                ),
+                                const SizedBox(height: 7),
+                                Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    SchedulesOutlineButton(
+                                      onPressed: () {
+                                        MoreInfoModal.show(
+                                          context,
+                                          Reservation(
+                                            entrepreneurId:
+                                            sortedSchedules[index]
+                                                .entrepreneurEntrepreneurId,
+                                            userId: sortedSchedules[index]
+                                                .userUserId,
+                                            modality:
+                                            sortedSchedules[index].modality,
+                                            startAt: DateTime.parse(
+                                                sortedSchedules[index]
+                                                    .scheduledDate),
+                                            entrepreneurPhone:
+                                            sortedSchedules[index]
+                                                .entrepreneurPhone,
+                                            scheduleId:
+                                            sortedSchedules[index].id,
+                                          ),
+                                        );
+                                      },
+                                      label: 'Mais informações',
+                                    ),
+                                    SchedulesOutlineButton(
+                                      onPressed: () {
+                                        _getCoordinatesFromAddress(
+                                            sortedSchedules[index].cep);
+                                      },
+                                      label: 'Como chegar',
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 30),
+                              ],
+                            );
+                          } else {
+                            return const Row();
+                          }
+                        },
                       ),
                     ),
+                  ),
                 ],
               ),
             ),
@@ -294,10 +461,19 @@ class _SchedulesPageState extends State<SchedulesPage> {
       List<Location> locations = await locationFromAddress(address);
       if (locations.isNotEmpty) {
         Location location = locations.first;
-        abrirWazeOuMaps(location.latitude, location.longitude);
+        // Agora chama o dialog de seleção ao invés de tentar abrir diretamente
+        await _showMapSelectionDialog(location.latitude, location.longitude);
       }
     } catch (e) {
       print('Error: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao obter coordenadas do endereço: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
     }
   }
 }

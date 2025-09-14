@@ -11,6 +11,7 @@ class User {
   String cep;
   String city;
   String state;
+  String imageUrl;
   User({
     this.name = '',
     this.email = '',
@@ -21,7 +22,8 @@ class User {
     this.addressNumber = '',
     this.cep = '',
     this.city = '',
-    this.state = ''
+    this.state = '',
+    this.imageUrl = '',
   });
 
   Map<String, dynamic> toMap() {
@@ -39,7 +41,8 @@ class User {
       'addressNumber': addressNumber,
       'cep': cep,
       'city': city,
-      'state': state
+      'state': state,
+      'imageUrl': imageUrl,
     };
   }
 
@@ -54,7 +57,8 @@ class User {
       addressNumber: map['addressNumber'] ?? '',
       cep: map['cep'],
       city: map['city'],
-      state: map['state']
+      state: map['state'],
+      imageUrl: map['imageUrl'],
     );
   }
 
@@ -64,6 +68,6 @@ class User {
 
   @override
   String toString() {
-    return 'User{name: $name, email: $email, password: $password, doc: $doc, phone: $phone, address: $address, addressNumber: $addressNumber, cep: $cep, city: $city, state: $state}';
+    return 'User{name: $name, email: $email, password: $password, doc: $doc, phone: $phone, address: $address, addressNumber: $addressNumber, cep: $cep, city: $city, state: $state, image: $imageUrl}';
   }
 }

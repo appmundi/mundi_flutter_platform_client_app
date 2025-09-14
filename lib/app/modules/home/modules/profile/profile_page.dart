@@ -25,7 +25,7 @@ class _ProfilePageState extends State<ProfilePage> {
     initProfile();
   }
 
-  Future<Map<String, dynamic>> initProfile()async{
+  Future<Map<String, dynamic>> initProfile() async {
     String token = await localStorage.read('accessToken');
     Map<String, dynamic> decodedToken = JwtDecoder.decode(token);
     print("Aq ${decodedToken}");
@@ -34,7 +34,7 @@ class _ProfilePageState extends State<ProfilePage> {
       name = decodedToken['username'];
       userId = decodedToken['id'];
     });
-   return decodedToken;
+    return decodedToken;
   }
 
   @override
@@ -46,11 +46,8 @@ class _ProfilePageState extends State<ProfilePage> {
         title: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            ProfileTile(name: name,),
-            Image.asset(
-              'assets/images/dark_logo.png',
-              height: 25,
-            ),
+            ProfileTile(name: name, userId: userId),
+            Image.asset('assets/images/dark_logo.png', height: 25),
           ],
         ),
       ),
@@ -61,12 +58,13 @@ class _ProfilePageState extends State<ProfilePage> {
             SettingButton(
               label: 'Detalhes da Conta',
               onPressed: () {
-                Modular.to.pushNamed('/profile/details', arguments: {'name': name, 'userId': userId});
+                Modular.to.pushNamed(
+                  '/profile/details',
+                  arguments: {'name': name, 'userId': userId},
+                );
               },
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             SettingButton.filled(
               label: 'Notificações',
               onPressed: () {
@@ -78,15 +76,12 @@ class _ProfilePageState extends State<ProfilePage> {
                 );
               },
             ),
-            SizedBox(
-              height: 10,
-            ),
+            SizedBox(height: 10),
             SettingButton(
               label: 'Sair',
               onPressed: () {
                 localStorage.clear();
                 Modular.to.pushNamed('/splash');
-
               },
             ),
           ],

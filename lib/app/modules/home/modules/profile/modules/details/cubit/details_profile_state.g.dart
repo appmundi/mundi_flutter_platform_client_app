@@ -11,7 +11,8 @@ extension DetailsProfileStatusMatch on DetailsProfileStatus {
       {required T Function() init,
       required T Function() loading,
       required T Function() success,
-      required T Function() error}) {
+      required T Function() error,
+      required T Function() updated}) {
     final v = this;
     if (v == DetailsProfileStatus.init) {
       return init();
@@ -29,6 +30,10 @@ extension DetailsProfileStatusMatch on DetailsProfileStatus {
       return error();
     }
 
+    if (v == DetailsProfileStatus.updated) {
+      return updated();
+    }
+
     throw Exception(
         'DetailsProfileStatus.match failed, found no match for: $this');
   }
@@ -38,7 +43,8 @@ extension DetailsProfileStatusMatch on DetailsProfileStatus {
       T Function()? init,
       T Function()? loading,
       T Function()? success,
-      T Function()? error}) {
+      T Function()? error,
+      T Function()? updated}) {
     final v = this;
     if (v == DetailsProfileStatus.init && init != null) {
       return init();
@@ -54,6 +60,10 @@ extension DetailsProfileStatusMatch on DetailsProfileStatus {
 
     if (v == DetailsProfileStatus.error && error != null) {
       return error();
+    }
+
+    if (v == DetailsProfileStatus.updated && updated != null) {
+      return updated();
     }
 
     return any();

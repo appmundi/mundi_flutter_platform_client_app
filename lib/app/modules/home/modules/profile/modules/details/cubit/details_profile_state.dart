@@ -7,7 +7,7 @@ import 'package:mundi_flutter_platform_client_app/app/models/user.dart';
 part 'details_profile_state.g.dart';
 
 @match
-enum DetailsProfileStatus { init, loading, success, error }
+enum DetailsProfileStatus { init, loading, success, error, updated }
 
 class DetailProfileState extends Equatable {
   final DetailsProfileStatus status;
