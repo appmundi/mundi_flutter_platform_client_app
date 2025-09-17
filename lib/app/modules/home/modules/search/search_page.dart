@@ -1,22 +1,21 @@
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/extension/size_screen_extension.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/colors_app.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/text_styles.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/filter_widget.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/gradient_text_field.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/horizontal_entrepreneurs_list.dart';
+import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/search/cubit/search_cubit.dart';
+import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/search/cubit/search_state.dart';
 
 import '../../../../models/entrepreneur.dart';
 import 'widgets/result_tile.dart';
 
 class SearchPage extends StatefulWidget {
   final List<Entrepreneur> specialOffers;
-  const SearchPage({
-    super.key,
-    required this.specialOffers,
-  });
+
+  const SearchPage({super.key, required this.specialOffers});
 
   @override
   State<SearchPage> createState() => _SearchPageState();
@@ -34,7 +33,7 @@ class _SearchPageState extends State<SearchPage> {
     'Spa & Massagem',
     'Esteticista',
     'Makeup',
-    'Outros Serviços'
+    'Outros Serviços',
   ];
 
   String selectedFilter = 'Tudo';
@@ -44,29 +43,14 @@ class _SearchPageState extends State<SearchPage> {
   void initState() {
     super.initState();
     filteredOffers = widget.specialOffers;
-
-    searchController.addListener(_filterOffers);
   }
-
-
 
   @override
   void dispose() {
-    searchController.removeListener(_filterOffers);
     searchController.dispose();
     whereController.dispose();
     whenController.dispose();
     super.dispose();
-  }
-
-  void _filterOffers() {
-    final query = searchController.text.toLowerCase();
-
-    setState(() {
-      filteredOffers = widget.specialOffers.where((entrepreneur) {
-        return entrepreneur.name.toLowerCase().contains(query);
-      }).toList();
-    });
   }
 
   @override
@@ -75,7 +59,6 @@ class _SearchPageState extends State<SearchPage> {
       children: [
         Container(
           width: 1.sw,
-          height: .26.sh - 1.statusBar,
           color: const Color(0xFF060E31),
           padding: EdgeInsets.only(top: 1.statusBar + 10, left: 30, right: 30),
           child: Column(
@@ -84,10 +67,7 @@ class _SearchPageState extends State<SearchPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Image.asset(
-                    'assets/images/logo.png',
-                    height: 31,
-                  ),
+                  Image.asset('assets/images/logo.png', height: 31),
                   Row(
                     children: [
                       Text(
@@ -97,28 +77,23 @@ class _SearchPageState extends State<SearchPage> {
                           color: Colors.white,
                         ),
                       ),
-                      const SizedBox(
-                        width: 20,
-                      ),
+                      const SizedBox(width: 20),
                       const Icon(
                         Icons.favorite_outline,
                         color: Color.fromRGBO(242, 242, 242, 1),
-                      )
+                      ),
                     ],
-                  )
+                  ),
                 ],
               ),
-              const SizedBox(
-                height: 25,
-              ),
+              const SizedBox(height: 25),
               GradientTextField(
                 hintText: 'Pesquisa aqui a especialidade...',
                 prefixIcon: Icons.search,
                 controller: searchController,
+                onSubmitted: context.read<SearchCubit>().applyFilter,
               ),
-              const SizedBox(
-                height: 20,
-              ),
+              const SizedBox(height: 20),
               /*Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -199,13 +174,21 @@ class _SearchPageState extends State<SearchPage> {
         Expanded(
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 20),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 25.0,
+                vertical: 20,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  HorizontalEntrepreneursList(
-                    title: 'Ofertas Especiais',
-                    entrepeneurs: filteredOffers,
+                  BlocBuilder<SearchCubit, SearchState>(
+                    builder: (context, state) {
+                      return HorizontalEntrepreneursList(
+                        title: 'Ofertas Especiais',
+                        entrepeneurs: state.entrepreneurs ?? [],
+                        isLoading: state.status == SearchStateStatus.loading,
+                      );
+                    },
                   ),
                   Text(
                     "Resultados",
@@ -214,31 +197,40 @@ class _SearchPageState extends State<SearchPage> {
                       color: context.colors.primary,
                     ),
                   ),
-                  const SizedBox(
-                    height: 15,
-                  ),
+                  const SizedBox(height: 15),
                   const FilterWidget(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: ListView.separated(
-                      separatorBuilder: (context, index) {
-                        return const SizedBox(
-                          height: 30,
-                        );
-                      },
-                      shrinkWrap: true,
-                      itemCount: filteredOffers.length,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        return ResultTile(entrepreneur: filteredOffers[index],);
-                      },
-                    ),
+                  BlocBuilder<SearchCubit, SearchState>(
+                    builder: (context, state) {
+                      final isLoading =
+                          state.status == SearchStateStatus.loading;
+                      final entrepreneurs = state.entrepreneurs ?? [];
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: ListView.separated(
+                          separatorBuilder: (context, index) {
+                            return const SizedBox(height: 30);
+                          },
+                          shrinkWrap: true,
+                          itemCount: isLoading ? 10 : entrepreneurs.length,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemBuilder: (context, index) {
+                            if (isLoading) {
+                              return const ResultTile.loading();
+                            }
+
+                            return ResultTile(
+                              entrepreneur: entrepreneurs[index],
+                            );
+                          },
+                        ),
+                      );
+                    },
                   ),
                 ],
               ),
             ),
           ),
-        )
+        ),
       ],
     );
   }

@@ -10,6 +10,7 @@ extension ReserveStatusMatch on ReserveStatus {
   T match<T>(
       {required T Function() init,
       required T Function() loading,
+      required T Function() loaded,
       required T Function() success,
       required T Function() error}) {
     final v = this;
@@ -19,6 +20,10 @@ extension ReserveStatusMatch on ReserveStatus {
 
     if (v == ReserveStatus.loading) {
       return loading();
+    }
+
+    if (v == ReserveStatus.loaded) {
+      return loaded();
     }
 
     if (v == ReserveStatus.success) {
@@ -36,6 +41,7 @@ extension ReserveStatusMatch on ReserveStatus {
       {required T Function() any,
       T Function()? init,
       T Function()? loading,
+      T Function()? loaded,
       T Function()? success,
       T Function()? error}) {
     final v = this;
@@ -45,6 +51,10 @@ extension ReserveStatusMatch on ReserveStatus {
 
     if (v == ReserveStatus.loading && loading != null) {
       return loading();
+    }
+
+    if (v == ReserveStatus.loaded && loaded != null) {
+      return loaded();
     }
 
     if (v == ReserveStatus.success && success != null) {

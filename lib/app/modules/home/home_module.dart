@@ -6,6 +6,7 @@ import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/chat/
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/entrepreneur/entrepreneur_module.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/profile/profile_module.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/schedules/cubit/schedules_cubit.dart';
+import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/search/cubit/search_cubit.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/entrepeneur/entrepreneur_repository.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/entrepeneur/i_entrepreneur_repository.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/schedule/i_schedule_repository.dart';
@@ -17,14 +18,10 @@ class HomeModule extends Module {
   @override
   void binds(Injector i) {
     i.addInstance<IScheduleRepository>(
-      ScheduleRepository(
-        rest: Modular.get<RestClient>(),
-      ),
+      ScheduleRepository(rest: Modular.get<RestClient>()),
     );
     i.addInstance<IEntrepreneurRepository>(
-      EntrepreneurRepository(
-        rest: Modular.get<RestClient>(),
-      ),
+      EntrepreneurRepository(rest: Modular.get<RestClient>()),
     );
   }
 
@@ -33,27 +30,33 @@ class HomeModule extends Module {
     super.routes(r);
     r.child(
       '/',
-      child: (context) => MultiBlocProvider(
-        providers: [
-          BlocProvider(
-            create: (context) => HomeCubit(
-              schedulesRepository: Modular.get<IScheduleRepository>(),
-              repository: Modular.get<IEntrepreneurRepository>(),
-            )..loadData(),
+      child:
+          (context) => MultiBlocProvider(
+            providers: [
+              BlocProvider(
+                create:
+                    (context) => HomeCubit(
+                      schedulesRepository: Modular.get<IScheduleRepository>(),
+                      repository: Modular.get<IEntrepreneurRepository>(),
+                    )..loadData(),
+              ),
+              BlocProvider(
+                create:
+                    (context) => ScheduleCubit(
+                      scheduleRepository: Modular.get<IScheduleRepository>(),
+                    )..loadSchedule(),
+              ),
+              BlocProvider(
+                create:
+                    (context) => SearchCubit(
+                      repository: Modular.get<IEntrepreneurRepository>(),
+                    )..loadData(),
+              ),
+            ],
+            child: const HomePage(currentPage: 0),
           ),
-          BlocProvider(
-            create: (context) => ScheduleCubit(
-              scheduleRepository: Modular.get<IScheduleRepository>(),
-            )..loadSchedule(),
-          )
-        ],
-        child: const HomePage(currentPage: 0,),
-      ),
     );
-    r.module(
-      '/entrepreneur',
-      module: EntrepreneurModule(),
-    );
+    r.module('/entrepreneur', module: EntrepreneurModule());
     r.module('/chat', module: ChatModule());
     r.module("/profile", module: ProfileModule());
   }

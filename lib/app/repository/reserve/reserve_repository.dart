@@ -13,47 +13,59 @@ class ReserveRepository implements IReserveRepository {
   ReserveRepository({required this.localStorage, required this.rest});
 
   @override
-  Future<void> createReserve(
-      {required int entrepreneurId,
-      required String scheduledDate,
-      required int modalityId}) async {
-    try {
-      final response = await rest.post("/scheduling/schedule", data: {
+  Future<void> createReserve({
+    required int entrepreneurId,
+    required String scheduledDate,
+    required List<int> modalityIds,
+    required String description,
+    Map<String, String>? address,
+  }) async {
+    final response = await rest.post(
+      "/scheduling/schedule",
+      data: {
         "entrepreneurId": entrepreneurId,
         "scheduledDate": scheduledDate,
-        "modalityId": modalityId,
-        "status": "INIT"
-      }, headers: {
+        "modalityIds": modalityIds,
+        "status": "INIT",
+        "description": description,
+        "address": address,
+      },
+      headers: {
         'Content-Type': 'application/json',
-        "Authorization": "Bearer ${await localStorage.read("accessToken")}"
-      });
+        "Authorization": "Bearer ${await localStorage.read("accessToken")}",
+      },
+    );
 
-      print("Reserva > ${response.data}");
-    } catch (e){
-      print("Error check > $e");
+    if (response.statusCode != 201) {
+      throw new Exception("Erro ao realizar reserva");
     }
+
+    print("Reserva > ${response.data}");
   }
 
   @override
-  Future<List<String>> checkHour(
-      {required int entrepreneurId, required String date}) async {
+  Future<List<String>> checkHour({
+    required int entrepreneurId,
+    required String date,
+    int? duration,
+  }) async {
     try {
-      final response = await rest.get("/scheduling/$entrepreneurId/available-times", headers: {
-        'Content-Type': 'application/json',
-        "Authorization": "Bearer ${await localStorage.read("accessToken")}"
-      },queryParameters: {
-        "date": date,
-      }, );
+      final response = await rest.get(
+        "/scheduling/$entrepreneurId/available-times",
+        headers: {
+          'Content-Type': 'application/json',
+          "Authorization": "Bearer ${await localStorage.read("accessToken")}",
+        },
+        queryParameters: {"date": date, "duration": duration},
+      );
 
-      // Ação com a lista de horários disponíveis
       List<String> availableTimes = List<String>.from(response.data);
       print("Available times: $availableTimes");
 
       return availableTimes;
-    } catch (e){
+    } catch (e) {
       print("Error check > $e");
       return [];
     }
   }
-
 }

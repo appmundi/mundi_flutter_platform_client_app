@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:dio/dio.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/exception/connection_exception.dart';
@@ -14,20 +15,18 @@ class AuthRepository implements IAuthRepository {
   final RestClient _rest;
   final LocalStorage localStorage;
 
-  const AuthRepository({
-    required RestClient rest, required LocalStorage
-  }) : _rest = rest, localStorage = LocalStorage;
+  const AuthRepository({required RestClient rest, required LocalStorage})
+    : _rest = rest,
+      localStorage = LocalStorage;
 
   @override
   Future<String> login(String email, String password) async {
     try {
-      final response = await _rest.post("/user/login", data: {
-        'email': email,
-        'password': password,
-        "isEntrepreneur": false
-      },headers: {
-        'Content-Type': 'application/json',
-      });
+      final response = await _rest.post(
+        "/user/login",
+        data: {'email': email, 'password': password, "isEntrepreneur": false},
+        headers: {'Content-Type': 'application/json'},
+      );
       if (response.statusCode == 401) {
         throw InvalidFieldException();
       }
@@ -40,7 +39,8 @@ class AuthRepository implements IAuthRepository {
       return accessToken;
     } on DioException {
       throw ConnectionException(
-          errorMessage: "Erro ao conectar-se com o Servidor");
+        errorMessage: "Erro ao conectar-se com o Servidor",
+      );
     }
   }
 
@@ -50,9 +50,7 @@ class AuthRepository implements IAuthRepository {
       final response = await _rest.post(
         "/user/register",
         data: user.toMap(),
-        headers: {
-          'Content-Type': 'application/json',
-        }
+        headers: {'Content-Type': 'application/json'},
       );
 
       if (response.data['mensagem'] == "Usuário já cadastrado") {
@@ -70,97 +68,152 @@ class AuthRepository implements IAuthRepository {
   @override
   Future<User> findOneById(int userId) async {
     try {
-      final response = await _rest.get("/user/searchById$userId", headers: {
-        'Content-Type': 'application/json',
-      });
+      final response = await _rest.get(
+        "/user/searchById$userId",
+        headers: {'Content-Type': 'application/json'},
+      );
       if (response.statusCode == 401) {
         throw InvalidFieldException();
       }
 
       final userData = User.fromJson(jsonEncode(response.data));
-      
+
       return userData;
     } on DioException {
       throw ConnectionException(
-          errorMessage: "Erro ao conectar-se com o Servidor");
+        errorMessage: "Erro ao conectar-se com o Servidor",
+      );
     }
   }
 
   @override
-  Future<void> updateUser(int userId, String name, String email, String phone) async {
+  Future<void> updateUser(
+    int userId,
+    String name,
+    String email,
+    String phone, [
+    File? image,
+  ]) async {
     try {
-      final response = await _rest.put("/user/$userId", data: {
-        'name': name,
-        'email': email,
-        'phone': phone
-      },headers: {
-        'Content-Type': 'application/json',
-      });
+      final response = await _rest.put(
+        "/user/$userId",
+        data: {
+          'name': name,
+          'email': email,
+          'phone': phone,
+          'image': image?.readAsBytesSync(),
+        },
+        headers: {'Content-Type': 'application/json'},
+      );
       if (response.statusCode == 401) {
         throw InvalidFieldException();
       }
-    }catch (e){
+    } catch (e) {
       print("Error > $e");
     } on DioException {
       throw ConnectionException(
-          errorMessage: "Erro ao conectar-se com o Servidor");
+        errorMessage: "Erro ao conectar-se com o Servidor",
+      );
     }
   }
 
   @override
   Future<void> resetPassword(String email) async {
     try {
-      final response = await _rest.post("/user/reset-password", data: {
-        'email': email
-      },headers: {
-        'Content-Type': 'application/json',
-      });
+      final response = await _rest.post(
+        "/user/reset-password",
+        data: {'email': email},
+        headers: {'Content-Type': 'application/json'},
+      );
       if (response.statusCode == 401) {
         throw InvalidFieldException();
       }
-
     } on DioException {
       throw ConnectionException(
-          errorMessage: "Erro ao conectar-se com o Servidor");
+        errorMessage: "Erro ao conectar-se com o Servidor",
+      );
     }
   }
 
   @override
   Future<void> validateCode(String email, String code) async {
     try {
-      final response = await _rest.post("/user/validate-reset-code", data: {
-        'email': email,
-        'code': code
-      },headers: {
-        'Content-Type': 'application/json',
-      });
+      final response = await _rest.post(
+        "/user/validate-reset-code",
+        data: {'email': email, 'code': code},
+        headers: {'Content-Type': 'application/json'},
+      );
       if (response.statusCode == 401) {
         throw InvalidFieldException();
       }
-
     } on DioException {
       throw ConnectionException(
-          errorMessage: "Erro ao conectar-se com o Servidor");
+        errorMessage: "Erro ao conectar-se com o Servidor",
+      );
     }
   }
 
   @override
-  Future<void> updatePassword(String email, String code, String newPassword) async {
+  Future<void> updatePassword(
+    String email,
+    String code,
+    String newPassword,
+  ) async {
     try {
-      final response = await _rest.post("/user/update-password", data: {
-        'email': email,
-        'code': code,
-        'newPassword': newPassword
-      },headers: {
-        'Content-Type': 'application/json',
-      });
+      final response = await _rest.post(
+        "/user/update-password",
+        data: {'email': email, 'code': code, 'newPassword': newPassword},
+        headers: {'Content-Type': 'application/json'},
+      );
       if (response.statusCode == 401) {
         throw InvalidFieldException();
       }
-
     } on DioException {
       throw ConnectionException(
-          errorMessage: "Erro ao conectar-se com o Servidor");
+        errorMessage: "Erro ao conectar-se com o Servidor",
+      );
+    }
+  }
+
+  @override
+  Future<void> updateImage(int userId, File file) async {
+    try {
+      final formData = FormData.fromMap({
+        'image': await MultipartFile.fromFile(
+          file.path,
+          filename: file.path.split('/').last,
+        ),
+      });
+
+      final response = await _rest.put(
+        "/user/update-image/$userId",
+        data: formData,
+      );
+
+      if (response.statusCode == 401) {
+        throw InvalidFieldException();
+      }
+    } on DioException {
+      throw ConnectionException(
+        errorMessage: "Erro ao conectar-se com o Servidor",
+      );
+    }
+  }
+
+  @override
+  Future<void> deleteImage(int userId) async {
+    try {
+      final response = await _rest.delete(
+        "/images/profile/user/$userId",
+      );
+
+      if (response.statusCode == 401) {
+        throw InvalidFieldException();
+      }
+    } on DioException {
+      throw ConnectionException(
+        errorMessage: "Erro ao conectar-se com o Servidor",
+      );
     }
   }
 }

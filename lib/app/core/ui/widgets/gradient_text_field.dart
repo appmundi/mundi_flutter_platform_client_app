@@ -12,6 +12,7 @@ class GradientTextField extends StatefulWidget {
   final EdgeInsetsGeometry? contentPadding;
   final TextEditingController controller;
   final Function(String)? function;
+  final Function(String)? onSubmitted;
   const GradientTextField({
     super.key,
     required this.hintText,
@@ -22,6 +23,7 @@ class GradientTextField extends StatefulWidget {
     this.padding,
     this.contentPadding,
     required this.controller,
+    this.onSubmitted,
     this.function
   });
 
@@ -56,6 +58,8 @@ class _GradientTextFieldState extends State<GradientTextField> {
       child: TextField(
         controller: widget.controller,
         maxLines: 1,
+        textInputAction: TextInputAction.search,
+        onSubmitted: widget.onSubmitted,
         onChanged: (string){
           widget.function!(string);
         },

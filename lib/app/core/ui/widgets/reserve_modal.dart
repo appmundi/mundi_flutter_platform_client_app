@@ -4,11 +4,11 @@ import 'package:mundi_flutter_platform_client_app/app/core/ui/extension/size_scr
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/colors_app.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/text_styles.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/reserve_tile.dart';
-import 'package:mundi_flutter_platform_client_app/app/models/reservation.dart';
+import 'package:mundi_flutter_platform_client_app/app/models/modality.dart';
 
 class ReserveModal {
   static Future<void> show(
-      BuildContext context, Reservation reservation) async {
+      BuildContext context, List<Modality> modalities, DateTime startAt) async {
     await showDialog(
       context: context,
       builder: (context) {
@@ -58,12 +58,30 @@ class ReserveModal {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      //TODO: temos um mock aqui
-                      ReserveTile(
-                        modality: reservation.modality,
-                        selectedDate: reservation.startAt,
-                        selectedTime: reservation.startAt.appTimeFormat,
-                      ),
+                      // Lista de modalidades agendadas
+                      ...modalities.map((modality) {
+                        // Calcular o horário para cada modalidade
+                        DateTime modalityStartTime = startAt;
+
+                        // Se não for a primeira modalidade, calcular o horário baseado nas anteriores
+                        if (modalities.indexOf(modality) > 0) {
+                          int totalPreviousDuration = 0;
+                          for (int i = 0; i < modalities.indexOf(modality); i++) {
+                            totalPreviousDuration += modalities[i].duration.toInt();
+                          }
+                          modalityStartTime = startAt.add(Duration(seconds: totalPreviousDuration));
+                        }
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 8.0),
+                          child: ReserveTile(
+                            modality: modality,
+                            selectedDate: modalityStartTime,
+                            selectedTime: modalityStartTime.appTimeFormat,
+                          ),
+                        );
+                      }).toList(),
+
                       Padding(
                         padding: const EdgeInsets.symmetric(
                             horizontal: 12.0, vertical: 10),

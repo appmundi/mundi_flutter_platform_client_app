@@ -1,4 +1,4 @@
-package com.example.mundi_flutter_platform_client_app
+package br.com.mundi.mundi_client_app
 
 import io.flutter.embedding.android.FlutterActivity
 

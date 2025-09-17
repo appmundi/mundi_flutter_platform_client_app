@@ -5,8 +5,9 @@ import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/text_styles
 class AppButtonOutline extends StatelessWidget {
   final String text;
   final VoidCallback onPressed;
+  final double? fontSize;
   const AppButtonOutline(
-      {super.key, required this.text, required this.onPressed});
+      {super.key, required this.text, required this.onPressed, this.fontSize});
 
   @override
   Widget build(BuildContext context) {
@@ -34,6 +35,7 @@ class AppButtonOutline extends StatelessWidget {
             text,
             style: context.textStyles.buttonFont.copyWith(
               color: context.colors.decorationPrimary,
+              fontSize: fontSize,
             ),
           ),
         ),

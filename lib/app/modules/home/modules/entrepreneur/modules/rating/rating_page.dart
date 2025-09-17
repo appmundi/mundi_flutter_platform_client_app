@@ -150,13 +150,16 @@ class _RatingPageState extends State<RatingPage> {
                     const SizedBox(
                       height: 5,
                     ),
-                    Text(
-                      rating?.comment ?? '',
-                      textAlign: TextAlign.justify,
-                      style: context.textStyles.textRegular.copyWith(
-                        color: const Color.fromRGBO(62, 62, 62, 1),
-                        fontSize: 13,
-                        height: 1.3,
+                    SizedBox(
+                      width: double.infinity,
+                      child: Text(
+                        rating?.comment ?? '',
+                        textAlign: TextAlign.justify,
+                        style: context.textStyles.textRegular.copyWith(
+                          color: const Color.fromRGBO(62, 62, 62, 1),
+                          fontSize: 13,
+                          height: 1.3,
+                        ),
                       ),
                     )
                   ],

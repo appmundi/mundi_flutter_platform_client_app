@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/rest/rest_client_exception.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/storage/local_storage.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/schedule.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/schedule/i_schedule_repository.dart';
@@ -46,7 +47,7 @@ class ScheduleRepository implements IScheduleRepository {
       log("Agendamentos > ${schedules.toString()}");
 
       return schedules;
-    } catch (e, s) {
+    } on RestClientException catch (e, s) {
       print(e);
       print(s);
       throw ConnectionException();

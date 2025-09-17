@@ -6,7 +6,7 @@ import 'package:match/match.dart';
 part 'reserve_state.g.dart';
 
 @match
-enum ReserveStatus { init, loading, success, error }
+enum ReserveStatus { init, loading, loaded, success, error }
 
 class ReserveState extends Equatable {
   final ReserveStatus status;

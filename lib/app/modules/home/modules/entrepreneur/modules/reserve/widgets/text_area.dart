@@ -4,7 +4,9 @@ import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/colors_app.
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/text_styles.dart';
 
 class TextArea extends StatefulWidget {
-  const TextArea({super.key});
+  final TextEditingController? controller;
+
+  const TextArea({super.key, this.controller});
 
   @override
   State<TextArea> createState() => _TextAreaState();
@@ -15,24 +17,19 @@ class _TextAreaState extends State<TextArea> {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        border: Border.all(
-          color: context.colors.secondary,
-          width: .5,
-        ),
-        borderRadius: BorderRadius.circular(
-          20,
-        ),
+        border: Border.all(color: context.colors.secondary, width: .5),
+        borderRadius: BorderRadius.circular(20),
       ),
-      width: .85.sw,
       height: 80,
       child: Stack(
         children: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 10.0),
             child: TextField(
+              controller: widget.controller,
               maxLines: 8,
               style: context.textStyles.textRegular.copyWith(
-                fontSize: 8,
+                fontSize: 10,
                 color: Colors.black,
               ),
               decoration: const InputDecoration(
@@ -54,13 +51,8 @@ class _TextAreaState extends State<TextArea> {
               width: 13,
               height: 13,
               decoration: BoxDecoration(
-                border: Border.all(
-                  color: const Color(0xFFD4D4D4),
-                  width: 1,
-                ),
-                borderRadius: BorderRadius.circular(
-                  6.5,
-                ),
+                border: Border.all(color: const Color(0xFFD4D4D4), width: 1),
+                borderRadius: BorderRadius.circular(6.5),
               ),
               alignment: Alignment.center,
               child: Text(
@@ -72,7 +64,7 @@ class _TextAreaState extends State<TextArea> {
                 ),
               ),
             ),
-          )
+          ),
         ],
       ),
     );

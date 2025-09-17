@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:typed_data';
 
+import 'package:mundi_flutter_platform_client_app/app/core/ui/extension/string_extension.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/work.dart';
 
 class Entrepreneur {
@@ -19,6 +21,9 @@ class Entrepreneur {
   final List<Operation> operation;
   List<Rating>? ratings;
   final double? distance;
+  final Uint8List? profileImage;
+  final List<int>? imagesID;
+  final bool optionwork;
   //final String category;
 
 
@@ -39,6 +44,9 @@ class Entrepreneur {
     required this.operation,
     this.ratings,
     this.distance,
+    this.profileImage,
+    this.imagesID,
+    this.optionwork = false,
     //required this.category
   });
 
@@ -88,6 +96,9 @@ class Entrepreneur {
           ? List<Rating>.from(map['avaliation']?.map((x) => Rating.fromMap(x)))
           : null,
       distance: double.parse(map['distance'] ?? "0.0"),
+       profileImage: (map['profileImage'] as String?)?.bytesFromBase64,
+       imagesID: ((map['images'] as List?) ?? []).map((item) => item as int).toList(),
+       optionwork: map['optionwork'] != null ? map['optionwork'] is int ? map['optionwork'] == 1 : map['optionwork'] : false,
        // category: map['category']
       //category: map['category'].map<Category>((x) => Category.fromMap(x)).toList()
     );

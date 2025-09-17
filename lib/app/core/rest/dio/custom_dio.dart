@@ -38,6 +38,9 @@ class CustomDio implements RestClient {
       {Map<String, dynamic>? queryParameters,
       Map<String, dynamic>? headers}) async {
     try {
+      print(path);
+      print(queryParameters);
+      print(headers);
       final response = await _dio.get(
         path,
         queryParameters: queryParameters,
@@ -83,6 +86,26 @@ class CustomDio implements RestClient {
           options: Options(headers: headers));
       return RestClientResponse<T>.fromDio(response);
     }on DioException catch (e) {
+      throw RestClientException.fromDioException(e);
+    }
+  }
+
+  @override
+  Future<RestClientResponse<T>> delete<T>(
+      String path, {
+        dynamic data,
+        Map<String, dynamic>? queryParameters,
+        Map<String, dynamic>? headers,
+      }) async {
+    try {
+      final response = await _dio.delete(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: Options(headers: headers),
+      );
+      return RestClientResponse<T>.fromDio(response);
+    } on DioException catch (e) {
       throw RestClientException.fromDioException(e);
     }
   }

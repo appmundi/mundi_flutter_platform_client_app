@@ -66,4 +66,25 @@ class HttpRestClient implements RestClient {
     });
     return headers;
   }
+
+  @override
+  Future<RestClientResponse<T>> delete<T>(
+      String path, {
+        dynamic data,
+        Map<String, dynamic>? queryParameters,
+        Map<String, String>? headers,
+      }) async {
+    final uri = Uri.https(baseUrl, path, queryParameters);
+
+    final request = http.Request('DELETE', uri);
+    request.headers.addAll(joinHeaders(headers));
+    if (data != null) {
+      request.body = data;
+    }
+
+    final streamedResponse = await rest.send(request);
+    final response = await http.Response.fromStream(streamedResponse);
+    return RestClientResponse.fromHttp(response);
+  }
+
 }

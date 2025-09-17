@@ -2,14 +2,17 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/helpers/environments.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/colors_app.dart';
 
 class ImageSnapping extends StatefulWidget {
   final bool favorite;
-  final List<Uint8List> fetchedImages;
-  const ImageSnapping({super.key, required this.fetchedImages}) : favorite = false;
+  final List<int> fetchedImages;
+  const ImageSnapping({super.key, required this.fetchedImages})
+    : favorite = false;
 
-  const ImageSnapping.favorite({super.key, required this.fetchedImages}) : favorite = true;
+  const ImageSnapping.favorite({super.key, required this.fetchedImages})
+    : favorite = true;
 
   @override
   State<ImageSnapping> createState() => _ImageSnappingState();
@@ -25,9 +28,7 @@ class _ImageSnappingState extends State<ImageSnapping> {
     return Container(
       height: .30.sh,
       clipBehavior: Clip.hardEdge,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-      ),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
       child: Stack(
         children: [
           PageView.builder(
@@ -37,16 +38,21 @@ class _ImageSnappingState extends State<ImageSnapping> {
                 selectedImg = value;
               });
             },
-            itemCount: widget.fetchedImages.isEmpty ? 1 : widget.fetchedImages.length,
+            itemCount:
+                widget.fetchedImages.isEmpty ? 1 : widget.fetchedImages.length,
             itemBuilder: (context, index) {
-              return widget.fetchedImages.isNotEmpty
-                  ? Image.memory(
-                widget.fetchedImages.first,
+              if (widget.fetchedImages.isEmpty) {
+                return Image.asset('assets/images/dark_logo.png');
+              }
+              final imageID = widget.fetchedImages[index];
+              final imageUrl =
+                  "${Environments.get('BASE_URL')}/images/$imageID";
+              return Image.network(
+                imageUrl,
                 fit: BoxFit.cover,
-              )
-                  : Image.asset(
-                'assets/images/barber.png',
-
+                errorBuilder: (context, error, stackTrace) {
+                  return Image.asset('assets/images/dark_logo.png');
+                },
               );
             },
           ),
@@ -79,11 +85,12 @@ class _ImageSnappingState extends State<ImageSnapping> {
               child: ListView.separated(
                 shrinkWrap: true,
                 separatorBuilder: (context, index) {
-                  return const SizedBox(
-                    width: 5,
-                  );
+                  return const SizedBox(width: 5);
                 },
-                itemCount: widget.fetchedImages.isEmpty ? 1 : widget.fetchedImages.length,
+                itemCount:
+                    widget.fetchedImages.isEmpty
+                        ? 1
+                        : widget.fetchedImages.length,
                 scrollDirection: Axis.horizontal,
                 itemBuilder: (context, index) {
                   return Container(
@@ -101,13 +108,11 @@ class _ImageSnappingState extends State<ImageSnapping> {
                           ), // changes position of shadow
                         ),
                       ],
-                      color: index == selectedImg
-                          ? Colors.white
-                          : Colors.transparent,
-                      border: Border.all(
-                        color: Colors.white,
-                        width: 1,
-                      ),
+                      color:
+                          index == selectedImg
+                              ? Colors.white
+                              : Colors.transparent,
+                      border: Border.all(color: Colors.white, width: 1),
                     ),
                   );
                 },
