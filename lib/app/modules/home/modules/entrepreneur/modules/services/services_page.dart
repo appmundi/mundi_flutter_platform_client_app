@@ -56,7 +56,6 @@ class _ServicesPageState extends State<ServicesPage> {
           const SizedBox(
             height: 10,
           ),
-          const FilterWidget(),
           Flexible(
             child: ListView.separated(
               physics: const AlwaysScrollableScrollPhysics(),

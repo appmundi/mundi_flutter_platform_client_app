@@ -40,7 +40,7 @@ class _RecoveryPasswordPageState extends State<RecoveryPasswordPage> with Messag
   }
 
   void onReturn() {
-    if (_stepController.page != 2) {
+    if (_stepController.page != 0) {
       _stepController.previousPage(
           duration: const Duration(milliseconds: 20), curve: Curves.bounceIn);
     } else {

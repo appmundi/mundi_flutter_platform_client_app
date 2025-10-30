@@ -7,7 +7,10 @@ import 'package:mundi_flutter_platform_client_app/app/core/helpers/firebase_api.
 import 'package:mundi_flutter_platform_client_app/app/core/storage/local_storage.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/extension/size_screen_extension.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/gradient_text_field.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/more_info.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/entrepreneur.dart';
+import 'package:mundi_flutter_platform_client_app/app/models/modality.dart';
+import 'package:mundi_flutter_platform_client_app/app/models/reservation.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/cubit/home_cubit.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/cubit/home_state.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/profile/profile_page.dart';
@@ -29,6 +32,30 @@ class _HomePageState extends State<HomePage> {
   FirebaseApi firebaseApi = FirebaseApi();
   final _pageController = PageController();
   int _currentPage = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    final reservation = Reservation(
+      userId: 1,
+      entrepreneurId: 42,
+      modality: const Modality(
+        id: 10,
+        title: "Corte de cabelo masculino",
+        duration: 3600,
+        price: 75.0,
+      ),
+      startAt: DateTime(2025, 10, 30, 14, 30),
+      entrepreneurPhone: "11987654321",
+      scheduleId: 555,
+    );
+
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+      if(mounted) {
+        MoreInfoModal.show(context, reservation);
+      }
+    },);
+  }
 
   @override
   Widget build(BuildContext context) {

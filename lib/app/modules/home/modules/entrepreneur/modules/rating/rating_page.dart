@@ -120,7 +120,7 @@ class _RatingPageState extends State<RatingPage> {
                               ),
                             ),
                             RatingBar.builder(
-                              initialRating: rating?.rating ?? 0,
+                              initialRating: double.parse((rating?.rating ?? 0.0).toStringAsFixed(1)),
                               minRating: 1,
                               maxRating: 5,
                               direction: Axis.horizontal,

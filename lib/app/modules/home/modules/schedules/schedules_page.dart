@@ -21,6 +21,7 @@ import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/sched
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/schedules/widgets/schedule_feedback_modal.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/schedules/widgets/schedules_outline_button.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/schedules/widgets/schedules_search_text_field.dart';
+import 'package:timezone/timezone.dart' hide Location;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/ui/widgets/more_info.dart';
@@ -353,7 +354,11 @@ class _SchedulesPageState extends State<SchedulesPage> {
                   const SizedBox(
                     height: 25,
                   ),
-                  const FilterWidget(),
+                  FilterWidget(
+                    onTap: () {
+
+                    },
+                  ),
                   const SizedBox(
                     height: 15,
                   ),
@@ -371,8 +376,8 @@ class _SchedulesPageState extends State<SchedulesPage> {
                         shrinkWrap: true,
                         itemCount: sortedSchedules.length,
                         itemBuilder: (context, index) {
-                          DateTime scheduledDate = DateTime.parse(
-                              sortedSchedules[index].scheduledDate);
+                          TZDateTime scheduledDate = TZDateTime.from(DateTime.parse(
+                              sortedSchedules[index].scheduledDate), local);
 
                           final currentDate = DateTime.now();
                           final currentDateWithoutTime = DateTime(

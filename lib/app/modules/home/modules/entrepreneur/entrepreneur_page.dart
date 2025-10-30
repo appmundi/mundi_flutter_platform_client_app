@@ -43,7 +43,7 @@ class _EntrepreneurPageState extends State<EntrepreneurPage>
     _tabController = TabController(length: 4, vsync: this);
   }
 
-  double calculeStars(List<Rating> ratings) {
+  double calculateStars(List<Rating> ratings) {
     stars = 0.0;
     for (var i = 0; i < (ratings.length); i++) {
       stars = stars + ratings[i].rating;
@@ -189,7 +189,7 @@ class _EntrepreneurPageState extends State<EntrepreneurPage>
                               ),
                               const SizedBox(width: 5),
                               Text(
-                                calculeStars(
+                                calculateStars(
                                   state.entrepreneur?.ratings ?? [],
                                 ).toString(),
                                 style: context.textStyles.textMedium.copyWith(

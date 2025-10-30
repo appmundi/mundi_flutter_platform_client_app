@@ -23,7 +23,6 @@ class MoreInfoModal {
       context: context,
       builder: (context) {
         return FractionallySizedBox(
-          heightFactor: 0.7,
           child: GestureDetector(
             onTap: () {
               Navigator.of(context).pop();
