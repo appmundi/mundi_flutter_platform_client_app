@@ -34,30 +34,6 @@ class _HomePageState extends State<HomePage> {
   int _currentPage = 0;
 
   @override
-  void initState() {
-    super.initState();
-    final reservation = Reservation(
-      userId: 1,
-      entrepreneurId: 42,
-      modality: const Modality(
-        id: 10,
-        title: "Corte de cabelo masculino",
-        duration: 3600,
-        price: 75.0,
-      ),
-      startAt: DateTime(2025, 10, 30, 14, 30),
-      entrepreneurPhone: "11987654321",
-      scheduleId: 555,
-    );
-
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
-      if(mounted) {
-        MoreInfoModal.show(context, reservation);
-      }
-    },);
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: true,
