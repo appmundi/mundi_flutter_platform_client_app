@@ -7,6 +7,8 @@ import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/entre
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/profile/profile_module.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/schedules/cubit/schedules_cubit.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/search/cubit/search_cubit.dart';
+import 'package:mundi_flutter_platform_client_app/app/repository/address/address_repository.dart';
+import 'package:mundi_flutter_platform_client_app/app/repository/address/i_address_repository.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/entrepeneur/entrepreneur_repository.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/entrepeneur/i_entrepreneur_repository.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/schedule/i_schedule_repository.dart';
@@ -23,6 +25,7 @@ class HomeModule extends Module {
     i.addInstance<IEntrepreneurRepository>(
       EntrepreneurRepository(rest: Modular.get<RestClient>()),
     );
+    i.addInstance<IAddressRepository>(AddressRepository());
   }
 
   @override
@@ -50,6 +53,7 @@ class HomeModule extends Module {
                 create:
                     (context) => SearchCubit(
                       repository: Modular.get<IEntrepreneurRepository>(),
+                      addressRepository: Modular.get<IAddressRepository>(),
                     )..loadData(),
               ),
             ],

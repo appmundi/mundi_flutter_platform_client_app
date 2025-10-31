@@ -42,7 +42,7 @@ class _DetailsPageState extends State<DetailsProfilePage>
   void _showImageOptionsModal() {
     final hasImage =
         image != null ||
-        (currentImageUrl != null && currentImageUrl!.isNotEmpty);
+            (currentImageUrl != null && currentImageUrl!.isNotEmpty);
 
     showModalBottomSheet(
       context: context,
@@ -131,12 +131,17 @@ class _DetailsPageState extends State<DetailsProfilePage>
   }
 
   Widget _buildProfileImagePicker(String? imageUrl) {
+    // Tamanho responsivo da imagem baseado na largura da tela
+    final screenWidth = MediaQuery.of(context).size.width;
+    final imageSize = screenWidth < 360 ? 100.0 : (screenWidth < 400 ? 110.0 : 120.0);
+    final cameraIconSize = screenWidth < 360 ? 25.0 : 30.0;
+
     return Center(
       child: Column(
         children: [
           Container(
-            width: 120,
-            height: 120,
+            width: imageSize,
+            height: imageSize,
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
@@ -172,11 +177,11 @@ class _DetailsPageState extends State<DetailsProfilePage>
                           child: Center(
                             child: CircularProgressIndicator(
                               value:
-                                  loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          (loadingProgress.expectedTotalBytes ??
-                                              1)
-                                      : null,
+                              loadingProgress.expectedTotalBytes != null
+                                  ? loadingProgress.cumulativeBytesLoaded /
+                                  (loadingProgress.expectedTotalBytes ??
+                                      1)
+                                  : null,
                               strokeWidth: 2,
                             ),
                           ),
@@ -197,10 +202,10 @@ class _DetailsPageState extends State<DetailsProfilePage>
                             color: Colors.black.withOpacity(0.3),
                             shape: BoxShape.circle,
                           ),
-                          child: const Icon(
+                          child: Icon(
                             Icons.camera_alt,
                             color: Colors.white,
-                            size: 30,
+                            size: cameraIconSize,
                           ),
                         ),
                       ),
@@ -210,12 +215,12 @@ class _DetailsPageState extends State<DetailsProfilePage>
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: screenWidth < 360 ? 12 : 16),
           Text(
             'Toque para alterar a foto',
             style: TextStyle(
               color: Colors.white.withOpacity(0.7),
-              fontSize: 14,
+              fontSize: screenWidth < 360 ? 12 : 14,
             ),
           ),
           const SizedBox(height: 8),
@@ -223,7 +228,7 @@ class _DetailsPageState extends State<DetailsProfilePage>
             'Máximo 2MB',
             style: TextStyle(
               color: Colors.white.withOpacity(0.5),
-              fontSize: 12,
+              fontSize: screenWidth < 360 ? 11 : 12,
             ),
           ),
         ],
@@ -233,11 +238,28 @@ class _DetailsPageState extends State<DetailsProfilePage>
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // Padding responsivo baseado no tamanho da tela
+    final horizontalPadding = screenWidth < 360 ? 20.0 : (screenWidth < 400 ? 25.0 : 30.0);
+    final verticalPadding = screenHeight < 700 ? 20.0 : (screenHeight < 800 ? 30.0 : 40.0);
+
+    // Espaçamentos responsivos
+    final fieldSpacing = screenHeight < 700 ? 12.0 : 15.0;
+    final mainSpacing = screenHeight < 700 ? 20.0 : 30.0;
+    final buttonSpacing = screenHeight < 700 ? 30.0 : 45.0;
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
           mainAxisAlignment: MainAxisAlignment.end,
-          children: [Image.asset('assets/images/dark_logo.png', height: 25)],
+          children: [
+            Image.asset(
+              'assets/images/dark_logo.png',
+              height: screenWidth < 360 ? 20 : 25,
+            )
+          ],
         ),
       ),
       body: BlocConsumer<DetailProfileCubit, DetailProfileState>(
@@ -250,61 +272,84 @@ class _DetailsPageState extends State<DetailsProfilePage>
 
           if(state.status == DetailsProfileStatus.updated) {
             showSuccess("Alterado com Sucesso !");
-
             Modular.to.navigate('/home/');
           }
         },
         builder: (context, state) {
           print("Usuario state > ${state.user.toString()}");
 
-          return BlurryContainer(
-            color: const Color.fromRGBO(6, 14, 39, 1),
-            width: 1.sw,
-            padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 40),
-            borderRadius: const BorderRadius.only(
-              topLeft: Radius.circular(40),
-              topRight: Radius.circular(40),
-            ),
-            blur: 20,
-            child: Column(
-              children: [
-                // Componente de seleção de imagem de perfil
-                _buildProfileImagePicker('${Environments.get('BASE_URL')}/images/profile/user/${widget.userId}?t=${DateTime.now().millisecondsSinceEpoch}'),
-                const SizedBox(height: 30),
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height -
+                    MediaQuery.of(context).padding.top -
+                    kToolbarHeight,
+              ),
+              child: BlurryContainer(
+                color: const Color.fromRGBO(6, 14, 39, 1),
+                width: 1.sw,
+                padding: EdgeInsets.symmetric(
+                  horizontal: horizontalPadding,
+                  vertical: verticalPadding,
+                ),
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(screenWidth < 360 ? 30 : 40),
+                  topRight: Radius.circular(screenWidth < 360 ? 30 : 40),
+                ),
+                blur: 20,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // Componente de seleção de imagem de perfil
+                    _buildProfileImagePicker(
+                        '${Environments.get('BASE_URL')}/images/profile/user/${widget.userId}?t=${DateTime.now().millisecondsSinceEpoch}'
+                    ),
+                    SizedBox(height: mainSpacing),
 
-                AppTextField(hintText: 'Nome', label: 'Nome', controller: name),
-                const SizedBox(height: 15),
-                AppTextField(
-                  hintText: 'Email',
-                  label: 'Email',
-                  controller: email,
-                  validator: Validatorless.multiple([
-                    Validatorless.email("E-mail inválido"),
-                  ]),
+                    AppTextField(
+                      hintText: 'Nome',
+                      label: 'Nome',
+                      controller: name,
+                    ),
+                    SizedBox(height: fieldSpacing),
+                    AppTextField(
+                      hintText: 'Email',
+                      label: 'Email',
+                      controller: email,
+                      validator: Validatorless.multiple([
+                        Validatorless.email("E-mail inválido"),
+                      ]),
+                    ),
+                    SizedBox(height: fieldSpacing),
+                    AppTextField(
+                      hintText: 'Telefone',
+                      label: 'Telefone',
+                      controller: telefone,
+                      formatters: [MaskTextInputFormatter(mask: "(##) #####-####")],
+                    ),
+                    SizedBox(height: buttonSpacing),
+                    Center(
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: AppButton(
+                          text: 'Alterar',
+                          onPressed: () async {
+                            BlocProvider.of<DetailProfileCubit>(context).updateUser(
+                              widget.userId,
+                              name.text,
+                              email.text,
+                              telefone.text,
+                              image,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    // Espaço adicional para telas menores para evitar sobreposição do teclado
+                    if (screenHeight < 700) SizedBox(height: 20),
+                  ],
                 ),
-                const SizedBox(height: 15),
-                AppTextField(
-                  hintText: 'Telefone',
-                  label: 'Telefone',
-                  controller: telefone,
-                  formatters: [MaskTextInputFormatter(mask: "(##) #####-####")],
-                ),
-                const SizedBox(height: 45),
-                Center(
-                  child: AppButton(
-                    text: 'Alterar',
-                    onPressed: () async {
-                      BlocProvider.of<DetailProfileCubit>(context).updateUser(
-                        widget.userId,
-                        name.text,
-                        email.text,
-                        telefone.text,
-                        image,
-                      );
-                    },
-                  ),
-                ),
-              ],
+              ),
             ),
           );
         },

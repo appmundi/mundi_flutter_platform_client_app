@@ -11,6 +11,7 @@ import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/searc
 
 import '../../../../models/entrepreneur.dart';
 import 'widgets/result_tile.dart';
+import 'widgets/filter_dialog.dart';
 
 class SearchPage extends StatefulWidget {
   final List<Entrepreneur> specialOffers;
@@ -26,31 +27,74 @@ class _SearchPageState extends State<SearchPage> {
   final whereController = TextEditingController();
   final whenController = TextEditingController();
 
-  final servicesFilters = [
-    'Tudo',
-    'Cabelereiro',
-    'Salões de Beleza',
-    'Spa & Massagem',
-    'Esteticista',
-    'Makeup',
-    'Outros Serviços',
-  ];
-
-  String selectedFilter = 'Tudo';
-  List<Entrepreneur> filteredOffers = [];
-
-  @override
-  void initState() {
-    super.initState();
-    filteredOffers = widget.specialOffers;
-  }
-
   @override
   void dispose() {
     searchController.dispose();
     whereController.dispose();
     whenController.dispose();
     super.dispose();
+  }
+
+  void _showFilterDialog() async {
+    final result = await showDialog<Map<String, dynamic>>(
+      context: context,
+      builder: (context) => const FilterDialog(),
+    );
+
+    if (result != null && mounted) {
+      _applyFilters(result);
+      _showFilterFeedback(result);
+    }
+  }
+
+  void _applyFilters(Map<String, dynamic> filters) {
+    final List<int> specialtyIds = filters['specialtyIds'] as List<int>;
+    final double maxDistance = filters['maxDistance'] as double;
+    final double minRating = filters['minRating'] as double;
+
+    context.read<SearchCubit>().applyAdvancedFilters(
+      specialtyIds: specialtyIds.isNotEmpty ? specialtyIds : null,
+      maxDistance: maxDistance,
+      minRating: minRating,
+    );
+  }
+
+  void _showFilterFeedback(Map<String, dynamic> filters) {
+    final List<int> specialtyIds = filters['specialtyIds'] as List<int>;
+    final double maxDistance = filters['maxDistance'] as double;
+    final double minRating = filters['minRating'] as double;
+
+    final List<String> activeFilters = [];
+
+    if (specialtyIds.isNotEmpty) {
+      activeFilters.add('${specialtyIds.length} especialidade(s)');
+    }
+    if (maxDistance < 50) {
+      activeFilters.add('até ${maxDistance.toInt()} km');
+    }
+    if (minRating > 0) {
+      activeFilters.add('${minRating.toStringAsFixed(1)}⭐ ou mais');
+    }
+
+    if (activeFilters.isEmpty) {
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(
+          'Filtros aplicados: ${activeFilters.join(", ")}',
+          style: const TextStyle(color: Colors.white),
+        ),
+        backgroundColor: context.colors.secondary,
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+        margin: const EdgeInsets.all(20),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(10),
+        ),
+      ),
+    );
   }
 
   @override
@@ -94,80 +138,6 @@ class _SearchPageState extends State<SearchPage> {
                 onSubmitted: context.read<SearchCubit>().applyFilter,
               ),
               const SizedBox(height: 20),
-              /*Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  GradientTextField(
-                    width: .38.sw,
-                    height: 37,
-                    radius: 14,
-                    padding: EdgeInsets.zero,
-                    contentPadding: const EdgeInsets.only(bottom: 13),
-                    hintText: 'Onde',
-                    prefixIcon: Icons.location_on_outlined,
-                    controller: whereController,
-                  ),
-                  GradientTextField(
-                    width: .38.sw,
-                    height: 37,
-                    radius: 14,
-                    padding: EdgeInsets.zero,
-                    contentPadding: const EdgeInsets.only(bottom: 13),
-                    hintText: 'Quando',
-                    prefixIcon: Icons.calendar_today,
-                    controller: whenController,
-                  ),
-                ],
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              SizedBox(
-                height: 30,
-                width: 1.sw,
-                child: ListView.separated(
-                  separatorBuilder: (context, index) {
-                    return const SizedBox(
-                      width: 10,
-                    );
-                  },
-                  itemCount: servicesFilters.length,
-                  scrollDirection: Axis.horizontal,
-                  itemBuilder: (context, index) {
-                    final filter = servicesFilters[index];
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          selectedFilter = filter;
-                        });
-                      },
-                      child: Container(
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          border: filter == selectedFilter
-                              ? Border.all(
-                            color: context.colors.decorationPrimary,
-                            width: 1,
-                          )
-                              : null,
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        padding: const EdgeInsets.all(5),
-                        child: Text(
-                          filter,
-                          style: context.textStyles.textRegular.copyWith(
-                            color: Colors.white,
-                            fontSize: 13,
-                            fontWeight: filter == selectedFilter
-                                ? FontWeight.w600
-                                : FontWeight.w400,
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),*/
             ],
           ),
         ),
@@ -185,25 +155,121 @@ class _SearchPageState extends State<SearchPage> {
                     builder: (context, state) {
                       return HorizontalEntrepreneursList(
                         title: 'Ofertas Especiais',
-                        entrepeneurs: state.entrepreneurs ?? [],
-                        isLoading: state.status == SearchStateStatus.loading,
+                        entrepeneurs: widget.specialOffers,
+                        isLoading: false,
                       );
                     },
                   ),
-                  Text(
-                    "Resultados",
-                    style: context.textStyles.titleBold.copyWith(
-                      fontSize: 20,
-                      color: context.colors.primary,
-                    ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        "Resultados",
+                        style: context.textStyles.titleBold.copyWith(
+                          fontSize: 20,
+                          color: context.colors.primary,
+                        ),
+                      ),
+                      BlocBuilder<SearchCubit, SearchState>(
+                        builder: (context, state) {
+                          final cubit = context.read<SearchCubit>();
+
+                          if (!cubit.hasActiveFilters) {
+                            return const SizedBox.shrink();
+                          }
+
+                          return GestureDetector(
+                            onTap: () {
+                              cubit.clearFilters();
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Text(
+                                    'Filtros removidos',
+                                    style: TextStyle(color: Colors.white),
+                                  ),
+                                  backgroundColor: context.colors.secondary,
+                                  behavior: SnackBarBehavior.floating,
+                                  duration: const Duration(seconds: 2),
+                                  margin: const EdgeInsets.all(20),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                  ),
+                                ),
+                              );
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 6,
+                              ),
+                              decoration: BoxDecoration(
+                                color: context.colors.decorationPrimary.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(
+                                  color: context.colors.decorationPrimary,
+                                  width: 1,
+                                ),
+                              ),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(
+                                    'Limpar filtros',
+                                    style: context.textStyles.textRegular.copyWith(
+                                      fontSize: 11,
+                                      color: context.colors.decorationPrimary,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Icon(
+                                    Icons.close,
+                                    size: 14,
+                                    color: context.colors.decorationPrimary,
+                                  ),
+                                ],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    ],
                   ),
                   const SizedBox(height: 15),
-                  const FilterWidget(),
+                  FilterWidget(
+                    onTap: _showFilterDialog,
+                  ),
                   BlocBuilder<SearchCubit, SearchState>(
                     builder: (context, state) {
-                      final isLoading =
-                          state.status == SearchStateStatus.loading;
+                      final isLoading = state.status == SearchStateStatus.loading;
                       final entrepreneurs = state.entrepreneurs ?? [];
+
+                      if (!isLoading && entrepreneurs.isEmpty) {
+                        return Padding(
+                          padding: const EdgeInsets.all(40.0),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                Icon(
+                                  Icons.search_off,
+                                  size: 64,
+                                  color: Colors.grey[400],
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Nenhum resultado encontrado',
+                                  style: context.textStyles.textRegular.copyWith(
+                                    fontSize: 16,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
                       return Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: ListView.separated(

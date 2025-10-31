@@ -7,7 +7,10 @@ import 'package:mundi_flutter_platform_client_app/app/core/helpers/firebase_api.
 import 'package:mundi_flutter_platform_client_app/app/core/storage/local_storage.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/extension/size_screen_extension.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/gradient_text_field.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/more_info.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/entrepreneur.dart';
+import 'package:mundi_flutter_platform_client_app/app/models/modality.dart';
+import 'package:mundi_flutter_platform_client_app/app/models/reservation.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/cubit/home_cubit.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/cubit/home_state.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/profile/profile_page.dart';

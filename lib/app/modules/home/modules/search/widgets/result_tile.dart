@@ -4,6 +4,7 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/ui/extension/ratings_extension.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/colors_app.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/text_styles.dart';
@@ -198,7 +199,7 @@ class _ResultTileState extends State<ResultTile> {
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  '0',
+                  '${widget.entrepreneur?.ratings?.media ?? 0}',
                   style: context.textStyles.textMedium.copyWith(
                     color: context.colors.decorationPrimary,
                     fontSize: 14,
@@ -213,7 +214,7 @@ class _ResultTileState extends State<ResultTile> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "${widget.entrepreneur!.distance} km  Jul 4",
+              "${widget.entrepreneur!.distance?.toStringAsFixed(2)} km",
               style: context.textStyles.textRegular.copyWith(
                 fontSize: 14,
                 color: const Color.fromRGBO(113, 113, 113, 1),

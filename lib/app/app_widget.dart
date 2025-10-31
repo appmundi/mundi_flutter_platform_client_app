@@ -21,7 +21,6 @@ class AppWidget extends StatelessWidget {
           ],
           supportedLocales: const [
             Locale('pt', 'BR'),
-            Locale('en'),
           ],
           title: UiConfig.title,
           locale: const Locale('pt', 'BR'),
