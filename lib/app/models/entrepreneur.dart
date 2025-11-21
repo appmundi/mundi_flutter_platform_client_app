@@ -20,12 +20,13 @@ class Entrepreneur {
   final List<Work> works;
   final List<Operation> operation;
   List<Rating>? ratings;
-  final double? distance;
+  double? distance;
   final Uint8List? profileImage;
   final List<int>? imagesID;
   final bool optionwork;
-  //final String category;
-
+  final List<Category> category;
+  final double longitude;
+  final double latitude;
 
   Entrepreneur({
     required this.id,
@@ -42,12 +43,14 @@ class Entrepreneur {
     required this.email,
     required this.phone,
     required this.operation,
+    required this.latitude,
+    required this.longitude,
     this.ratings,
     this.distance,
     this.profileImage,
     this.imagesID,
     this.optionwork = false,
-    //required this.category
+    required this.category,
   });
 
   String get fullAddress =>
@@ -69,7 +72,7 @@ class Entrepreneur {
       'works': works.map((x) => x.toMap()).toList(),
       //'ratings': ratings?.map((x) => x?.toMap())?.toList(),
       'distance': distance,
-      //'category': category
+      'category': category,
     };
   }
 
@@ -88,19 +91,36 @@ class Entrepreneur {
       phone: map['phone'] ?? '',
       email: map['email'] ?? '',
       operation: List<Operation>.from(
-          json.decode(map['operation'])?.map((x) => Operation.fromMap(x)) ??
-              const []),
+        json.decode(map['operation'])?.map((x) => Operation.fromMap(x)) ??
+            const [],
+      ),
       works: List<Work>.from(
-          map['works']?.map((x) => Work.fromMap(x)) ?? const []),
-      ratings: map['avaliation'] != null
-          ? List<Rating>.from(map['avaliation']?.map((x) => Rating.fromMap(x)))
-          : null,
+        map['works']?.map((x) => Work.fromMap(x)) ?? const [],
+      ),
+      ratings:
+          map['avaliation'] != null
+              ? List<Rating>.from(
+                map['avaliation']?.map((x) => Rating.fromMap(x)),
+              )
+              : null,
       distance: double.parse(map['distance'] ?? "0.0"),
-       profileImage: (map['profileImage'] as String?)?.bytesFromBase64,
-       imagesID: ((map['images'] as List?) ?? []).map((item) => item as int).toList(),
-       optionwork: map['optionwork'] != null ? map['optionwork'] is int ? map['optionwork'] == 1 : map['optionwork'] : false,
-       // category: map['category']
-      //category: map['category'].map<Category>((x) => Category.fromMap(x)).toList()
+      latitude: map['latitude'].toDouble() ?? 0.0,
+      longitude: map['longitude'].toDouble() ?? 0.0,
+      profileImage: (map['profileImage'] as String?)?.bytesFromBase64,
+      imagesID:
+          ((map['images'] as List?) ?? []).map((item) => item as int).toList(),
+      optionwork:
+          map['optionwork'] != null
+              ? map['optionwork'] is int
+                  ? map['optionwork'] == 1
+                  : map['optionwork']
+              : false,
+      category:
+          map['category'] == null
+              ? []
+              : map['category']
+                  .map<Category>((x) => Category.fromMap(x))
+                  .toList(),
     );
   }
 
@@ -121,18 +141,20 @@ class Operation {
   String openinHours;
   String closingTime;
 
-  Operation(
-      {required this.day,
-      this.isActive = false,
-      this.openinHours = "9:00",
-      this.closingTime = "18:00"});
+  Operation({
+    required this.day,
+    this.isActive = false,
+    this.openinHours = "9:00",
+    this.closingTime = "18:00",
+  });
 
   factory Operation.fromMap(Map<String, dynamic> data) {
     return Operation(
-        day: data['day'],
-        closingTime: data['closingTime'],
-        isActive: data['isActive'],
-        openinHours: data['openinHours']);
+      day: data['day'],
+      closingTime: data['closingTime'],
+      isActive: data['isActive'],
+      openinHours: data['openinHours'],
+    );
   }
 
   @override
@@ -145,18 +167,14 @@ class Category {
   int id;
   String type;
 
-
-  Category(
-      {required this.id,
-         this.type = "Barbearia"});
+  Category({required this.id, this.type = "Barbearia"});
 
   factory Category.fromMap(Map<String, dynamic> data) {
-    return Category(
-        id: data['id'],
-        type: data['type']);
+    return Category(id: data['id'], type: data['type']);
   }
 
-  factory Category.fromJson(String source) => Category.fromMap(json.decode(source));
+  factory Category.fromJson(String source) =>
+      Category.fromMap(json.decode(source));
 }
 
 class Rating {
@@ -165,17 +183,19 @@ class Rating {
   String comment;
   String name;
 
-  Rating(
-      {required this.comment,
-      required this.id,
-      required this.rating,
-      required this.name});
+  Rating({
+    required this.comment,
+    required this.id,
+    required this.rating,
+    required this.name,
+  });
 
   factory Rating.fromMap(Map<String, dynamic> map) {
     return Rating(
-        comment: map['comment'],
-        id: map['id'],
-        rating: double.parse(map['rating'].toString()),
-        name: map['name']);
+      comment: map['comment'],
+      id: map['id'],
+      rating: double.parse(map['rating'].toString()),
+      name: map['name'],
+    );
   }
 }

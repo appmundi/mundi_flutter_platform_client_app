@@ -3,12 +3,16 @@ import 'dart:typed_data';
 
 extension StringExtension on String {
   List<int> get getHourAndMinuteFromAppTimeFormat {
+    print(this);
     // Divide a string usando ":" como delimitador
-    final parts = split(":");
+    List<String> parts = split(":");
 
     // Verifica se há pelo menos duas partes (horas e minutos)
     if (parts.length != 2) {
-      throw FormatException("Formato de hora inválido. O formato esperado é HH:mm");
+      parts = parts.first.split("h");
+      if(parts.length != 2) {
+        throw Exception('Formato de hora inválido. O formato esperado é HH:mm');
+      }
     }
 
     // Converte as partes para números inteiros

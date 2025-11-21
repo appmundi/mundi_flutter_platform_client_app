@@ -43,7 +43,7 @@ class _EntrepreneurPageState extends State<EntrepreneurPage>
     _tabController = TabController(length: 4, vsync: this);
   }
 
-  double calculeStars(List<Rating> ratings) {
+  double calculateStars(List<Rating> ratings) {
     stars = 0.0;
     for (var i = 0; i < (ratings.length); i++) {
       stars = stars + ratings[i].rating;
@@ -69,9 +69,14 @@ class _EntrepreneurPageState extends State<EntrepreneurPage>
         },
         builder: (context, state) {
           if (state.entrepreneur != null) {
+            final screenHeight = MediaQuery.of(context).size.height;
+            final screenWidth = MediaQuery.of(context).size.width;
+
             return Column(
               children: [
-                Expanded(
+                // Imagem do perfil - altura responsiva
+                SizedBox(
+                  height: screenHeight * 0.35,
                   child: Stack(
                     children: [
                       Container(
@@ -92,12 +97,12 @@ class _EntrepreneurPageState extends State<EntrepreneurPage>
                           },
                         ),
                       ),
-                      Align(
-                        alignment: Alignment.topLeft,
+                      Positioned(
+                        top: MediaQuery.of(context).padding.top,
+                        left: 0,
                         child: Container(
                           width: 40,
                           height: 30,
-                          margin: EdgeInsets.only(top: 1.statusBar),
                           padding: const EdgeInsets.all(5.0),
                           decoration: const BoxDecoration(
                             color: Colors.white,
@@ -108,9 +113,7 @@ class _EntrepreneurPageState extends State<EntrepreneurPage>
                           ),
                           child: Center(
                             child: InkWell(
-                              onTap: () {
-                                Modular.to.pop();
-                              },
+                              onTap: () => Modular.to.pop(),
                               child: Icon(
                                 Icons.arrow_back,
                                 size: 20,
@@ -120,171 +123,172 @@ class _EntrepreneurPageState extends State<EntrepreneurPage>
                           ),
                         ),
                       ),
-                      Align(
-                        alignment: Alignment.bottomLeft,
-                        child: Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: InkWell(
-                            onTap: () {
-                              setState(() {
-                                favorite = !favorite;
-                              });
-                            },
-                            child: Icon(
-                              favorite
-                                  ? Icons.favorite
-                                  : Icons.favorite_outline,
-                              size: 30,
-                              color:
-                                  favorite
-                                      ? context.colors.secondary
-                                      : Colors.white,
-                            ),
+                      Positioned(
+                        bottom: 8,
+                        left: 8,
+                        child: InkWell(
+                          onTap: () {
+                            setState(() {
+                              favorite = !favorite;
+                            });
+                          },
+                          child: Icon(
+                            favorite ? Icons.favorite : Icons.favorite_outline,
+                            size: 30,
+                            color: favorite ? context.colors.secondary : Colors.white,
                           ),
                         ),
                       ),
                     ],
                   ),
                 ),
-                Container(
-                  width: 1.sw,
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 10,
-                    horizontal: 20,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Wrap(
-                        alignment: WrapAlignment.spaceBetween,
+
+                // Conteúdo scrollável
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(
+                        vertical: 10,
+                        horizontal: screenWidth * 0.05,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Column(
+                          // Header com nome e avaliação
+                          Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                state.entrepreneur?.name ?? '',
-                                style: context.textStyles.textMedium.copyWith(
-                                  color: const Color(0xFF212121),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      state.entrepreneur?.name ?? '',
+                                      style: context.textStyles.textMedium.copyWith(
+                                        color: const Color(0xFF212121),
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 5),
+                                    Text(
+                                      state.entrepreneur?.fullAddress ?? '',
+                                      maxLines: 3,
+                                      style: context.textStyles.textRegular.copyWith(
+                                        color: const Color(0xFFA4A4A4),
+                                        fontSize: 10,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
-                              const SizedBox(height: 5),
-                              Text(
-                                state.entrepreneur?.fullAddress ?? '',
-                                maxLines: 3,
-                                style: context.textStyles.textRegular.copyWith(
-                                  color: const Color(0xFFA4A4A4),
-                                  fontSize: 10,
-                                ),
+                              const SizedBox(width: 12),
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.star,
+                                    size: 10,
+                                    color: context.colors.decorationPrimary,
+                                  ),
+                                  const SizedBox(width: 5),
+                                  Text(
+                                    calculateStars(
+                                      state.entrepreneur?.ratings ?? [],
+                                    ).toString(),
+                                    style: context.textStyles.textMedium.copyWith(
+                                      fontSize: 16,
+                                      color: context.colors.decorationPrimary,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
-                          Row(
-                            children: [
-                              Icon(
-                                Icons.star,
-                                size: 10,
-                                color: context.colors.decorationPrimary,
-                              ),
-                              const SizedBox(width: 5),
-                              Text(
-                                calculeStars(
-                                  state.entrepreneur?.ratings ?? [],
-                                ).toString(),
-                                style: context.textStyles.textMedium.copyWith(
-                                  fontSize: 16,
-                                  color: context.colors.decorationPrimary,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children:
-                            ((state.entrepreneur?.imagesID ?? []).isEmpty
-                                    ? tabs
-                                        .where((tab) => tab != 'Portfólio')
-                                        .toList()
-                                    : tabs)
-                                .map<Widget>((tab) {
-                                  return InkWell(
+
+                          const SizedBox(height: 20),
+
+                          // Tabs responsivas
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: ((state.entrepreneur?.imagesID ?? []).isEmpty
+                                  ? tabs.where((tab) => tab != 'Portfólio').toList()
+                                  : tabs)
+                                  .map<Widget>((tab) {
+                                final isSelected = tabs.indexOf(tab) == _tabController.index;
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: InkWell(
                                     onTap: () {
                                       setState(() {
-                                        _tabController.animateTo(
-                                          tabs.indexOf(tab),
-                                        );
+                                        _tabController.animateTo(tabs.indexOf(tab));
                                       });
                                     },
                                     child: Container(
-                                      padding: const EdgeInsets.all(5.0),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12.0,
+                                        vertical: 8.0,
+                                      ),
                                       decoration: BoxDecoration(
-                                        border:
-                                            tabs.indexOf(tab) ==
-                                                    _tabController.index
-                                                ? Border.all(
-                                                  color:
-                                                      context
-                                                          .colors
-                                                          .decorationPrimary,
-                                                  width: 1,
-                                                )
-                                                : null,
+                                        border: isSelected
+                                            ? Border.all(
+                                          color: context.colors.decorationPrimary,
+                                          width: 1,
+                                        )
+                                            : null,
                                         borderRadius: BorderRadius.circular(6),
                                       ),
-                                      child: Center(
-                                        child: Text(
-                                          tab,
-                                          style: context.textStyles.textMedium
-                                              .copyWith(
-                                                fontWeight:
-                                                    tabs.indexOf(tab) ==
-                                                            _tabController.index
-                                                        ? FontWeight.w800
-                                                        : FontWeight.w600,
-                                                color: Colors.black,
-                                              ),
+                                      child: Text(
+                                        tab,
+                                        style: context.textStyles.textMedium.copyWith(
+                                          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                          color: Colors.black,
+                                          fontSize: 13,
                                         ),
                                       ),
                                     ),
-                                  );
-                                })
-                                .toList(),
+                                  ),
+                                );
+                              })
+                                  .toList(),
+                            ),
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          // TabBarView com altura dinâmica
+                          SizedBox(
+                            height: screenHeight * 0.55,
+                            child: TabBarView(
+                              physics: const NeverScrollableScrollPhysics(),
+                              controller: _tabController,
+                              children: [
+                                ServicesPage(
+                                  entrepreneur: state.entrepreneur!,
+                                  services: state.entrepreneur!.works,
+                                  entrepreneurId: state.entrepreneur?.id,
+                                ),
+                                RatingPage(
+                                  ratings: state.entrepreneur?.ratings,
+                                  stars: stars,
+                                ),
+                                if ((state.entrepreneur?.imagesID ?? []).isNotEmpty)
+                                  PortfolioPage(
+                                    services: state.entrepreneur!.works,
+                                    images: state.entrepreneur?.imagesID ?? [],
+                                  ),
+                                DetailsPage(
+                                  address: state.entrepreneur!.address,
+                                  email: state.entrepreneur!.email,
+                                  phone: state.entrepreneur!.phone,
+                                  operation: state.entrepreneur?.operation ?? [],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
-                      SizedBox(
-                        height: 450,
-                        child: TabBarView(
-                          physics: const NeverScrollableScrollPhysics(),
-                          controller: _tabController,
-                          children: [
-                            ServicesPage(
-                              entrepreneur: state.entrepreneur!,
-                              services: state.entrepreneur!.works,
-                              entrepreneurId: state.entrepreneur?.id,
-                            ),
-                            RatingPage(
-                              ratings: state.entrepreneur?.ratings,
-                              stars: stars,
-                              //ratings: widget.entrepreneur.ratings ?? [],
-                            ),
-                            if ((state.entrepreneur?.imagesID ?? []).isNotEmpty)
-                              PortfolioPage(
-                                services: state.entrepreneur!.works,
-                                images: state.entrepreneur?.imagesID ?? [],
-                              ),
-                            DetailsPage(
-                              address: state.entrepreneur!.address,
-                              email: state.entrepreneur!.email,
-                              phone: state.entrepreneur!.phone,
-                              operation: state.entrepreneur?.operation ?? [],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
+                    ),
                   ),
                 ),
               ],

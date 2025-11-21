@@ -21,6 +21,7 @@ class EntrepreneurRepository implements IEntrepreneurRepository {
       }, queryParameters: {
         'query': query,
       });
+      print(response.data);
       final entrepreneurs = (response.data as List)
           .map<Entrepreneur>((data){
        return Entrepreneur.fromMap(data);

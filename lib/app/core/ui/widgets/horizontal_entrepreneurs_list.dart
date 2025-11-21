@@ -10,10 +10,12 @@ import 'package:mundi_flutter_platform_client_app/app/modules/home/widgets/entre
 class HorizontalEntrepreneursList extends StatefulWidget {
   final List<Entrepreneur> entrepeneurs;
   final String title;
+  final bool isLoading;
   const HorizontalEntrepreneursList({
     super.key,
     required this.title,
     required this.entrepeneurs,
+    this.isLoading = false,
   });
 
   @override
@@ -51,6 +53,10 @@ class _HorizontalEntrepreneursListState extends State<HorizontalEntrepreneursLis
             shrinkWrap: true,
             itemCount: widget.entrepeneurs.length,
             itemBuilder: (context, index) {
+              if(widget.isLoading) {
+                return const EntrepreneurTile.loading();
+              }
+
               final entrepreneur = widget.entrepeneurs[index];
               return InkWell(
                 onTap: () {
