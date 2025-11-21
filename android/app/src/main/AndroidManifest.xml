@@ -45,7 +45,7 @@
         android:label="mundi_flutter_platform_client_app"
         android:hardwareAccelerated="false"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/launcher_icon">
         <activity
             android:name=".MainActivity"
             android:exported="true"
