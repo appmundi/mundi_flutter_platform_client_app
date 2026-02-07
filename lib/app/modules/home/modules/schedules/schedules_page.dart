@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart' hide Feedback;
@@ -21,7 +20,6 @@ import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/sched
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/schedules/widgets/schedule_feedback_modal.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/schedules/widgets/schedules_outline_button.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/schedules/widgets/schedules_search_text_field.dart';
-import 'package:timezone/timezone.dart' hide Location;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/ui/widgets/more_info.dart';
@@ -193,27 +191,84 @@ class _SchedulesPageState extends State<SchedulesPage> {
     }
 
     try {
-      if (await canLaunchUrl(Uri.parse(url))) {
-        await launchUrl(
-          Uri.parse(url),
-          mode: LaunchMode.externalApplication,
-        );
-      } else {
-        // Se o aplicativo não estiver instalado, mostrar mensagem de erro
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Não foi possível abrir o ${_getMapName(mapType)}. Verifique se está instalado.'),
-              backgroundColor: Colors.red,
-            ),
+      final uri = Uri.parse(url);
+      
+      // No iOS, canLaunchUrl não funciona bem para URL schemes customizados
+      // mesmo quando estão no Info.plist. Tentamos abrir diretamente.
+      if (Platform.isIOS) {
+        try {
+          final launched = await launchUrl(
+            uri,
+            mode: LaunchMode.externalApplication,
           );
+          
+          if (!launched) {
+            // Se não conseguiu abrir e é o Waze, oferece instalar
+            if (mapType == 'waze' && mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Waze não está instalado. Abrindo App Store...'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+              await launchUrl(
+                Uri.parse('https://apps.apple.com/app/id323229106'),
+                mode: LaunchMode.externalApplication,
+              );
+            } else if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Não foi possível abrir o ${_getMapName(mapType)}.'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          }
+        } catch (e) {
+          // Se der erro ao tentar abrir Waze, oferece instalar
+          if (mapType == 'waze' && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Waze não está instalado. Abrindo App Store...'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+            await launchUrl(
+              Uri.parse('https://apps.apple.com/app/id323229106'),
+              mode: LaunchMode.externalApplication,
+            );
+          } else if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Erro ao abrir ${_getMapName(mapType)}: ${e.toString()}'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } else {
+        // Android: verifica antes de tentar abrir
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(
+            uri,
+            mode: LaunchMode.externalApplication,
+          );
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Não foi possível abrir o ${_getMapName(mapType)}. Verifique se está instalado.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
         }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erro ao abrir o aplicativo de mapas: $e'),
+            content: Text('Erro ao abrir o aplicativo de mapas: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -376,8 +431,8 @@ class _SchedulesPageState extends State<SchedulesPage> {
                         shrinkWrap: true,
                         itemCount: sortedSchedules.length,
                         itemBuilder: (context, index) {
-                          TZDateTime scheduledDate = TZDateTime.from(DateTime.parse(
-                              sortedSchedules[index].scheduledDate), local);
+                          // Parse a data como UTC e usa diretamente (sem conversão de timezone)
+                          final scheduledDate = DateTime.parse(sortedSchedules[index].scheduledDate);
 
                           final currentDate = DateTime.now();
                           final currentDateWithoutTime = DateTime(

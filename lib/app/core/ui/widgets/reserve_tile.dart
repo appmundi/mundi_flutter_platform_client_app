@@ -26,17 +26,25 @@ class _ReserveTileState extends State<ReserveTile> {
 
   calculateDuration() {
     try {
+      // Verifica se selectedTime não está vazio
+      if (widget.selectedTime.isEmpty) {
+        endsAt = "";
+        setState(() {});
+        return;
+      }
+
       var [hour, minute] =
           widget.selectedTime.getHourAndMinuteFromAppTimeFormat;
       minute = minute + widget.modality.getDuration();
       if (minute < 60) {
         endsAt = "${hour}h${minute.toString().padLeft(2, "0")}";
       } else {
-        endsAt = minute == 60 ? "${hour + 1}h" : "${hour + 1}h${minute - 60}";
+        endsAt = minute == 60 ? "${hour + 1}h00" : "${hour + 1}h${(minute - 60).toString().padLeft(2, "0")}";
       }
     } catch (e, s) {
-      print(e);
+      print('Erro ao calcular duração: $e');
       print(s);
+      endsAt = ""; // Define como vazio em caso de erro
     }
     setState(() {});
   }

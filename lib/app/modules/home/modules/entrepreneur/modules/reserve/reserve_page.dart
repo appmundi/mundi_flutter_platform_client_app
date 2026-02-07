@@ -521,12 +521,15 @@ class _ReservePageState extends State<ReservePage> with Messages<ReservePage> {
                         final [hour, minute] =
                             selectedTime.getHourAndMinuteFromAppTimeFormat;
 
+                        // Cria a data no timezone local e converte para UTC antes de enviar
+                        final localDateTime = _dateController.selectedDate!
+                            .fillHourAndMinute(hour, minute);
+                        final utcDateTime = localDateTime.toUtc();
+
                         ReadContext(context).read<ReserveCubit>().createReserve(
                           entrepreneurId: widget.reservePageArguments.entrepreneurId,
                           modalityIds: modalities.map((modality) => modality.id).toList(),
-                          scheduledDate: _dateController.selectedDate!
-                              .fillHourAndMinute(hour, minute)
-                              .toIso8601String(),
+                          scheduledDate: utcDateTime.toIso8601String(),
                           description: descriptionController.text,
                           address: entrepreneur.optionwork ? {
                             'number': numberController.text.trim(),

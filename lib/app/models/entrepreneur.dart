@@ -56,6 +56,22 @@ class Entrepreneur {
   String get fullAddress =>
       "$address, $addressNumber,\n$city - ${state.replaceAll('State of', '')}, $cnpj";
 
+  static Uint8List? _decodeProfileImage(dynamic profileImageData) {
+    if (profileImageData == null) return null;
+    
+    final profileImageString = profileImageData as String?;
+    if (profileImageString == null || profileImageString.isEmpty) {
+      return null;
+    }
+    
+    try {
+      return profileImageString.bytesFromBase64;
+    } catch (e) {
+      print('Erro ao decodificar profileImage: $e');
+      return null;
+    }
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'id': id,
@@ -106,7 +122,7 @@ class Entrepreneur {
       distance: double.parse(map['distance'] ?? "0.0"),
       latitude: map['latitude'].toDouble() ?? 0.0,
       longitude: map['longitude'].toDouble() ?? 0.0,
-      profileImage: (map['profileImage'] as String?)?.bytesFromBase64,
+      profileImage: _decodeProfileImage(map['profileImage']),
       imagesID:
           ((map['images'] as List?) ?? []).map((item) => item as int).toList(),
       optionwork:
