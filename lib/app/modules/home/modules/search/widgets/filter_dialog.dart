@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/colors_app.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/text_styles.dart';
+import 'package:mundi_flutter_platform_client_app/app/models/entrepreneur.dart';
+import 'package:mundi_flutter_platform_client_app/app/repository/category/i_category_repository.dart';
 
 class FilterDialog extends StatefulWidget {
   const FilterDialog({super.key});
@@ -10,19 +13,43 @@ class FilterDialog extends StatefulWidget {
 }
 
 class _FilterDialogState extends State<FilterDialog> {
-  // Especialidades baseadas nos IDs do sistema
-  final List<Map<String, dynamic>> specialties = [
-    {'id': 1, 'name': 'Barbearia'},
-    {'id': 2, 'name': 'Salão de Beleza'},
-    {'id': 3, 'name': 'Manicure'},
-    {'id': 4, 'name': 'Makeup'},
-    {'id': 5, 'name': 'Saúde e Bem-estar'},
-    {'id': 6, 'name': 'Estética'},
-  ];
+  final ICategoryRepository _categoryRepository = Modular.get<ICategoryRepository>();
+  
+  List<Category> specialties = [];
+  bool isLoading = true;
+  String? errorMessage;
 
   List<int> selectedSpecialties = [];
   double maxDistance = 50.0; // km
   double minRating = 0.0; // 0 a 5
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCategories();
+  }
+
+  Future<void> _loadCategories() async {
+    try {
+      setState(() {
+        isLoading = true;
+        errorMessage = null;
+      });
+
+      final categories = await _categoryRepository.getAll();
+      
+      setState(() {
+        specialties = categories;
+        isLoading = false;
+      });
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Erro ao carregar categorias';
+        isLoading = false;
+      });
+      print('Erro ao carregar categorias: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -103,54 +130,83 @@ class _FilterDialogState extends State<FilterDialog> {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Wrap(
-                      spacing: 10,
-                      runSpacing: 10,
-                      children: specialties.map((specialty) {
-                        final isSelected = selectedSpecialties.contains(specialty['id']);
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              if (isSelected) {
-                                selectedSpecialties.remove(specialty['id']);
-                              } else {
-                                selectedSpecialties.add(specialty['id']);
-                              }
-                            });
-                          },
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 18,
-                              vertical: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              color: isSelected
-                                  ? context.colors.decorationPrimary
-                                  : Colors.grey.shade50,
-                              border: Border.all(
+                    if (isLoading)
+                      const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(20.0),
+                          child: CircularProgressIndicator(),
+                        ),
+                      )
+                    else if (errorMessage != null)
+                      Center(
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Column(
+                            children: [
+                              Text(
+                                errorMessage!,
+                                style: context.textStyles.textRegular.copyWith(
+                                  color: Colors.red,
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              ElevatedButton(
+                                onPressed: _loadCategories,
+                                child: const Text('Tentar novamente'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    else
+                      Wrap(
+                        spacing: 10,
+                        runSpacing: 10,
+                        children: specialties.map((specialty) {
+                          final isSelected = selectedSpecialties.contains(specialty.id);
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                if (isSelected) {
+                                  selectedSpecialties.remove(specialty.id);
+                                } else {
+                                  selectedSpecialties.add(specialty.id);
+                                }
+                              });
+                            },
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 18,
+                                vertical: 12,
+                              ),
+                              decoration: BoxDecoration(
                                 color: isSelected
                                     ? context.colors.decorationPrimary
-                                    : Colors.grey.shade300,
-                                width: 2,
+                                    : Colors.grey.shade50,
+                                border: Border.all(
+                                  color: isSelected
+                                      ? context.colors.decorationPrimary
+                                      : Colors.grey.shade300,
+                                  width: 2,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
                               ),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Text(
-                              specialty['name'],
-                              style: context.textStyles.textRegular.copyWith(
-                                fontSize: 14,
-                                color: isSelected
-                                    ? Colors.white
-                                    : context.colors.primary,
-                                fontWeight: isSelected
-                                    ? FontWeight.w600
-                                    : FontWeight.w500,
+                              child: Text(
+                                specialty.type,
+                                style: context.textStyles.textRegular.copyWith(
+                                  fontSize: 14,
+                                  color: isSelected
+                                      ? Colors.white
+                                      : context.colors.primary,
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w500,
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      }).toList(),
-                    ),
+                          );
+                        }).toList(),
+                      ),
 
                     const SizedBox(height: 32),
 

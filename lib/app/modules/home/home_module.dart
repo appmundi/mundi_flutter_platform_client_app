@@ -13,6 +13,8 @@ import 'package:mundi_flutter_platform_client_app/app/repository/entrepeneur/ent
 import 'package:mundi_flutter_platform_client_app/app/repository/entrepeneur/i_entrepreneur_repository.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/schedule/i_schedule_repository.dart';
 
+import '../../repository/category/category_repository.dart';
+import '../../repository/category/i_category_repository.dart';
 import '../../repository/schedule/schedule_repository.dart';
 import 'home_page.dart';
 
@@ -26,6 +28,9 @@ class HomeModule extends Module {
       EntrepreneurRepository(rest: Modular.get<RestClient>()),
     );
     i.addInstance<IAddressRepository>(AddressRepository());
+    i.addInstance<ICategoryRepository>(
+      CategoryRepository(rest: Modular.get<RestClient>()),
+    );
   }
 
   @override
