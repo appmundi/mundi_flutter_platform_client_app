@@ -9,3 +9,9 @@ extension DateTimeExtension on DateTime {
     return DateTime(year, month, day, hour, minute);
   }
 }
+
+extension ApiDateStringExtension on String {
+  DateTime get apiDateMinusThreeHours {
+    return DateTime.parse(this).subtract(const Duration(hours: 3));
+  }
+}

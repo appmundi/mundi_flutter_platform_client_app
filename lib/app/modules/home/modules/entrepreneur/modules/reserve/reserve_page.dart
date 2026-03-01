@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,10 +15,8 @@ import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/reserve_mo
 import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/reserve_tile.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/entrepreneur.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/modality.dart';
-import 'package:mundi_flutter_platform_client_app/app/models/reservation.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/entrepreneur/modules/reserve/widgets/add_services_dialog.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/entrepreneur/modules/reserve/widgets/text_area.dart';
-import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/schedules/widgets/schedules_search_text_field.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import 'cubit/reserve_cubit.dart';
@@ -460,7 +457,7 @@ class _ReservePageState extends State<ReservePage> with Messages<ReservePage> {
                     ],
 
                     TextArea(controller: descriptionController),
-                    const SizedBox(height: 80),
+                    const SizedBox(height: 20),
                   ],
                 ),
               ),
@@ -521,15 +518,15 @@ class _ReservePageState extends State<ReservePage> with Messages<ReservePage> {
                         final [hour, minute] =
                             selectedTime.getHourAndMinuteFromAppTimeFormat;
 
-                        // Cria a data no timezone local e converte para UTC antes de enviar
+                        // Monta data/hora no formato local selecionado pelo usuário
                         final localDateTime = _dateController.selectedDate!
                             .fillHourAndMinute(hour, minute);
-                        final utcDateTime = localDateTime.toUtc();
 
                         ReadContext(context).read<ReserveCubit>().createReserve(
                           entrepreneurId: widget.reservePageArguments.entrepreneurId,
                           modalityIds: modalities.map((modality) => modality.id).toList(),
-                          scheduledDate: utcDateTime.toIso8601String(),
+                          // Envia sempre em UTC para evitar variação por timezone do servidor
+                          scheduledDate: localDateTime.toUtc().toIso8601String(),
                           description: descriptionController.text,
                           address: entrepreneur.optionwork ? {
                             'number': numberController.text.trim(),

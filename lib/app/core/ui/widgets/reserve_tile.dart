@@ -22,36 +22,30 @@ class ReserveTile extends StatefulWidget {
 }
 
 class _ReserveTileState extends State<ReserveTile> {
-  String endsAt = "";
-
-  calculateDuration() {
+  String calculateDuration() {
     try {
-      // Verifica se selectedTime não está vazio
       if (widget.selectedTime.isEmpty) {
-        endsAt = "";
-        setState(() {});
-        return;
+        return "";
       }
 
       var [hour, minute] =
           widget.selectedTime.getHourAndMinuteFromAppTimeFormat;
-      minute = minute + widget.modality.getDuration();
-      if (minute < 60) {
-        endsAt = "${hour}h${minute.toString().padLeft(2, "0")}";
-      } else {
-        endsAt = minute == 60 ? "${hour + 1}h00" : "${hour + 1}h${(minute - 60).toString().padLeft(2, "0")}";
-      }
+      final totalMinutes =
+          (hour * 60) + minute + widget.modality.getDuration();
+      final endHour = (totalMinutes ~/ 60) % 24;
+      final endMinute = totalMinutes % 60;
+
+      return "${endHour}h${endMinute.toString().padLeft(2, "0")}";
     } catch (e, s) {
       print('Erro ao calcular duração: $e');
       print(s);
-      endsAt = ""; // Define como vazio em caso de erro
+      return "";
     }
-    setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
-    calculateDuration();
+    final endsAt = calculateDuration();
 
     final screenWidth = MediaQuery.of(context).size.width;
     final isSmallScreen = screenWidth < 360;

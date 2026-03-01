@@ -39,12 +39,10 @@ class _SchedulesPageState extends State<SchedulesPage> {
     await context.read<ScheduleCubit>().loadSchedule();
   }
 
-  // Novo método para mostrar o dialog de seleção de mapas
   Future<void> _showMapSelectionDialog(double latitude, double longitude) async {
     final selectedOption = await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
-        // Lista de opções baseada na plataforma
         final mapOptions = _getMapOptions();
 
         return Dialog(
@@ -99,7 +97,6 @@ class _SchedulesPageState extends State<SchedulesPage> {
     }
   }
 
-  // Método para obter as opções de mapa baseado na plataforma
   List<Map<String, dynamic>> _getMapOptions() {
     final options = <Map<String, dynamic>>[
       {
@@ -172,7 +169,6 @@ class _SchedulesPageState extends State<SchedulesPage> {
     );
   }
 
-  // Método para abrir o mapa selecionado
   Future<void> _openSelectedMap(String mapType, double latitude, double longitude) async {
     String url;
 
@@ -276,7 +272,6 @@ class _SchedulesPageState extends State<SchedulesPage> {
     }
   }
 
-  // Método auxiliar para obter o nome do aplicativo de mapas
   String _getMapName(String mapType) {
     switch (mapType) {
       case 'waze':
@@ -362,11 +357,10 @@ class _SchedulesPageState extends State<SchedulesPage> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        // Ordenar a lista filtrada por data
         List<Schedule> sortedSchedules = List.from(state.scheduleFiltered);
         sortedSchedules.sort((a, b) {
-          DateTime dateA = DateTime.parse(a.scheduledDate);
-          DateTime dateB = DateTime.parse(b.scheduledDate);
+          DateTime dateA = a.scheduledDate.apiDateMinusThreeHours;
+          DateTime dateB = b.scheduledDate.apiDateMinusThreeHours;
           return dateA.compareTo(dateB);
         });
 
@@ -380,7 +374,7 @@ class _SchedulesPageState extends State<SchedulesPage> {
             centerTitle: false,
           ),
           body: RefreshIndicator(
-            onRefresh: _refreshSchedules, // Adicionando pull-to-refresh
+            onRefresh: _refreshSchedules,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
@@ -414,9 +408,6 @@ class _SchedulesPageState extends State<SchedulesPage> {
 
                     },
                   ),
-                  const SizedBox(
-                    height: 15,
-                  ),
 
                   Visibility(
                     visible: sortedSchedules.isNotEmpty,
@@ -426,13 +417,13 @@ class _SchedulesPageState extends State<SchedulesPage> {
                     child: Expanded(
                       child: ListView.separated(
                         separatorBuilder: (context, index) =>
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 2),
                         physics: const AlwaysScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: sortedSchedules.length,
                         itemBuilder: (context, index) {
-                          // Parse a data como UTC e usa diretamente (sem conversão de timezone)
-                          final scheduledDate = DateTime.parse(sortedSchedules[index].scheduledDate);
+                          final scheduledDate =
+                              sortedSchedules[index].scheduledDate.apiDateMinusThreeHours;
 
                           final currentDate = DateTime.now();
                           final currentDateWithoutTime = DateTime(
@@ -470,9 +461,9 @@ class _SchedulesPageState extends State<SchedulesPage> {
                                                 .userUserId,
                                             modality:
                                             sortedSchedules[index].modality,
-                                            startAt: DateTime.parse(
-                                                sortedSchedules[index]
-                                                    .scheduledDate),
+                                            startAt: sortedSchedules[index]
+                                                .scheduledDate
+                                                .apiDateMinusThreeHours,
                                             entrepreneurPhone:
                                             sortedSchedules[index]
                                                 .entrepreneurPhone,
