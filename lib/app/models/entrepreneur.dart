@@ -27,6 +27,7 @@ class Entrepreneur {
   final List<Category> category;
   final double longitude;
   final double latitude;
+  final String? description;
 
   Entrepreneur({
     required this.id,
@@ -51,6 +52,7 @@ class Entrepreneur {
     this.imagesID,
     this.optionwork = false,
     required this.category,
+    this.description,
   });
 
   String get fullAddress =>
@@ -137,6 +139,7 @@ class Entrepreneur {
               : map['category']
                   .map<Category>((x) => Category.fromMap(x))
                   .toList(),
+      description: map['description'],
     );
   }
 
