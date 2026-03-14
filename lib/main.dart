@@ -13,12 +13,12 @@ void main() async {
   Geolocator.requestPermission();
 
   tz.initializeTimeZones();
-
   tz.setLocalLocation(tz.getLocation('America/Sao_Paulo'));
 
   FlutterError.onError = (details) {
     debugPrint("Erro no Flutter (Skia): ${details.exception}");
   };
+
   runApp(
     ModularApp(
       module: AppModule(),
