@@ -16,8 +16,10 @@ import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/app_button
 import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/calendar_picker.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/default_padding.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/mundi_app_bar.dart';
+import 'package:mundi_flutter_platform_client_app/app/models/entrepreneur.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/user.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/auth/register/cubit/register_cubit.dart';
+import 'package:mundi_flutter_platform_client_app/app/repository/category/i_category_repository.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/auth/register/cubit/register_state.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/auth/register/widgets/card_register.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';

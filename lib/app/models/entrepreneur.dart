@@ -189,7 +189,10 @@ class Category {
   Category({required this.id, this.type = "Barbearia"});
 
   factory Category.fromMap(Map<String, dynamic> data) {
-    return Category(id: data['id'], type: data['type']);
+    return Category(
+      id: data['id'] is int ? data['id'] as int : int.tryParse(data['id']?.toString() ?? '0') ?? 0,
+      type: data['type']?.toString() ?? 'Barbearia',
+    );
   }
 
   factory Category.fromJson(String source) =>
