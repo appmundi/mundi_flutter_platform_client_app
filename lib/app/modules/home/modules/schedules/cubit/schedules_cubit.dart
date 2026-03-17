@@ -17,11 +17,31 @@ class ScheduleCubit extends Cubit<ScheduleState> {
   }
 
   Future<void> applyFilter(String filterText) async {
-    print('apply');
     try {
       emit(state.copyWith(status: ScheduleStatus.loading));
 
-      final newList = state.schedules!.where((Schedule element) {
+      // Se o texto do filtro estiver vazio, volta a lista original
+      if (filterText.trim().isEmpty) {
+        final originalList = state.schedules ?? <Schedule>[];
+
+        originalList.sort(
+          (a, b) => a.scheduledDate.apiDateMinusThreeHours.compareTo(
+            b.scheduledDate.apiDateMinusThreeHours,
+          ),
+        );
+
+        emit(
+          state.copyWith(
+            scheduleFiltered: originalList,
+            status: ScheduleStatus.success,
+          ),
+        );
+        return;
+      }
+
+      final baseList = state.schedules ?? <Schedule>[];
+
+      final newList = baseList.where((Schedule element) {
         return element.modality.title
             .toLowerCase()
             .contains(filterText.toString().toLowerCase());
@@ -33,9 +53,12 @@ class ScheduleCubit extends Cubit<ScheduleState> {
         ),
       );
 
-      print(newList);
-
-      emit(state.copyWith(scheduleFiltered: newList, schedules: newList, status: ScheduleStatus.success));
+      emit(
+        state.copyWith(
+          scheduleFiltered: newList,
+          status: ScheduleStatus.success,
+        ),
+      );
     } catch (e) {
       state.copyWith(scheduleFiltered: state.schedules);
     }

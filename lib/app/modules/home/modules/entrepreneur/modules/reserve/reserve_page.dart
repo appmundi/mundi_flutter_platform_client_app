@@ -368,102 +368,99 @@ class _ReservePageState extends State<ReservePage> with Messages<ReservePage> {
         ),
         body: Stack(
           children: [
-            SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 30,
-                      child: Center(
-                        child: Row(
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                Modular.to.pop();
-                              },
-                              child: Icon(
-                                Icons.arrow_back_ios,
-                                color: context.colors.secondary,
-                                size: 20,
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              "Fazer uma reserva",
-                              style: context.textStyles.titleBold.copyWith(
-                                color: context.colors.primary,
-                                fontSize: 20,
-                                height: .7,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: Text(
-                        DateTime.now().year.toString(),
-                        style: context.textStyles.titleBold.copyWith(
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    CalendarPicker(
-                      controller: _dateController,
-                      minDate: DateTime.now(),
-                      onSelectionChanged: (args) {
-                        _loadAvailableTimes();
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    AvailableTimesInput(
-                      availablesTimes: availablesTimes,
-                      onSelectTime: (time) {
-                        setState(() {
-                          selectedTime = time;
-                        });
-                      },
-                      selectedTime: selectedTime,
-                    ),
-                    const SizedBox(height: 30),
-                    ReserveTile(
-                      modality: widget.reservePageArguments.modality,
-                      selectedTime: selectedTime,
-                      selectedDate: _dateController.selectedDate!,
-                    ),
-                    const SizedBox(height: 30),
-                    GestureDetector(
-                      onTap: onAddModalities,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Icon(
-                            Icons.add,
-                            size: 25,
+            ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20)
+                  .copyWith(bottom: 120),
+              children: [
+                SizedBox(
+                  height: 30,
+                  child: Center(
+                    child: Row(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            Modular.to.pop();
+                          },
+                          child: Icon(
+                            Icons.arrow_back_ios,
                             color: context.colors.secondary,
+                            size: 20,
                           ),
-                          _buildAdditionalModalitiesContainer(),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          "Fazer uma reserva",
+                          style: context.textStyles.titleBold.copyWith(
+                            color: context.colors.primary,
+                            fontSize: 20,
+                            height: .7,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-
-                    // Campos de endereço (apenas se entrepreneur.optionwork == 1)
-                    if (entrepreneur.optionwork) ...[
-                      _buildAddressFields(),
-                    ],
-
-                    TextArea(controller: descriptionController),
-                    const SizedBox(height: 20),
-                  ],
+                  ),
                 ),
-              ),
+                const SizedBox(height: 20),
+                Center(
+                  child: Text(
+                    DateTime.now().year.toString(),
+                    style: context.textStyles.titleBold.copyWith(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                CalendarPicker(
+                  controller: _dateController,
+                  minDate: DateTime.now(),
+                  onSelectionChanged: (args) {
+                    _loadAvailableTimes();
+                  },
+                ),
+                const SizedBox(height: 20),
+                AvailableTimesInput(
+                  availablesTimes: availablesTimes,
+                  onSelectTime: (time) {
+                    setState(() {
+                      selectedTime = time;
+                    });
+                  },
+                  selectedTime: selectedTime,
+                ),
+                const SizedBox(height: 30),
+                ReserveTile(
+                  modality: widget.reservePageArguments.modality,
+                  selectedTime: selectedTime,
+                  selectedDate: _dateController.selectedDate!,
+                ),
+                const SizedBox(height: 30),
+                GestureDetector(
+                  onTap: onAddModalities,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Icon(
+                        Icons.add,
+                        size: 25,
+                        color: context.colors.secondary,
+                      ),
+                      _buildAdditionalModalitiesContainer(),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Campos de endereço (apenas se entrepreneur.optionwork == 1)
+                if (entrepreneur.optionwork) ...[
+                  _buildAddressFields(),
+                ],
+
+                TextArea(controller: descriptionController),
+                const SizedBox(height: 20),
+              ],
             ),
             Positioned(
-              bottom: 0,
+              bottom: 20,
               child: Container(
                 width: 1.sw,
                 padding: const EdgeInsets.symmetric(
