@@ -19,12 +19,22 @@ class AuthRepository implements IAuthRepository {
     : _rest = rest,
       localStorage = LocalStorage;
 
+  String _normalizeLoginIdentifier(String value) {
+    final v = value.trim();
+    if (v.contains('@')) return v;
+    return v.replaceAll(RegExp(r'\D'), '');
+  }
+
   @override
   Future<String> login(String email, String password) async {
     try {
       final response = await _rest.post(
         "/user/login",
-        data: {'email': email, 'password': password, "isEntrepreneur": false},
+        data: {
+          'email': _normalizeLoginIdentifier(email),
+          'password': password,
+          "isEntrepreneur": false,
+        },
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 401) {
