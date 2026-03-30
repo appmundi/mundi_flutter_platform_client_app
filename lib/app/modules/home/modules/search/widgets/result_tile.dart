@@ -167,7 +167,7 @@ class _ResultTileState extends State<ResultTile> {
         ),
         const SizedBox(height: 10),
         Text(
-          widget.entrepreneur!.name,
+          widget.entrepreneur!.displayName,
           style: context.textStyles.textMedium.copyWith(
             fontSize: 14,
             color: const Color.fromRGBO(33, 33, 33, 1),
@@ -182,11 +182,13 @@ class _ResultTileState extends State<ResultTile> {
             Expanded(
               child: Text(
                 widget.entrepreneur!.fullAddress,
-                maxLines: 4,
+                softWrap: true,
+                maxLines: 8,
                 textAlign: TextAlign.left,
                 style: context.textStyles.textRegular.copyWith(
                   fontSize: 10,
                   color: const Color.fromRGBO(164, 164, 164, 1),
+                  height: 1.35,
                 ),
               ),
             ),

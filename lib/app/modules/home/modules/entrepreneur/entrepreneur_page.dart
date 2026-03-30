@@ -209,7 +209,7 @@ class _EntrepreneurPageState extends State<EntrepreneurPage>
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      entrepreneur.name,
+                                      entrepreneur.displayName,
                                       style:
                                           context.textStyles.textMedium.copyWith(
                                         color: const Color(0xFF212121),
@@ -220,11 +220,13 @@ class _EntrepreneurPageState extends State<EntrepreneurPage>
                                     const SizedBox(height: 5),
                                     Text(
                                       entrepreneur.fullAddress,
-                                      maxLines: 3,
+                                      softWrap: true,
+                                      maxLines: 8,
                                       style:
                                           context.textStyles.textRegular.copyWith(
                                         color: const Color(0xFFA4A4A4),
                                         fontSize: 10,
+                                        height: 1.35,
                                       ),
                                     ),
                                   ],

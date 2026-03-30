@@ -7,6 +7,8 @@ import 'package:mundi_flutter_platform_client_app/app/models/work.dart';
 class Entrepreneur {
   final int id;
   final String name;
+  /// Nome fantasia / empresa (API: companyName).
+  final String companyName;
   final int numberOfAvaliations;
   final int discountPercentage;
   final String address;
@@ -32,6 +34,7 @@ class Entrepreneur {
   Entrepreneur({
     required this.id,
     required this.name,
+    this.companyName = '',
     required this.address,
     required this.addressNumber,
     required this.city,
@@ -55,8 +58,39 @@ class Entrepreneur {
     this.description,
   });
 
-  String get fullAddress =>
-      "$address, $addressNumber,\n$city - ${state.replaceAll('State of', '')}, $cnpj";
+  /// Nome exibido ao cliente: empresa, se existir; senão o nome do responsável.
+  String get displayName {
+    final c = companyName.trim();
+    return c.isNotEmpty ? c : name;
+  }
+
+  String get fullAddress {
+    final stateFmt = state.replaceAll('State of', '').trim();
+    final cepFmt = cep.trim();
+    final parts = <String>[
+      '$address, $addressNumber',
+      '$city - $stateFmt',
+    ];
+    // `cep` já vem só como 8 dígitos formatados (00000-000); evita repetir texto de endereço.
+    if (cepFmt.isNotEmpty) {
+      parts.add('CEP $cepFmt');
+    }
+    return parts.join('\n');
+  }
+
+  /// Extrai só a sequência numérica do CEP (8 dígitos). Ignora texto que não seja CEP.
+  static String _normalizeCepFromMap(Map<String, dynamic> map) {
+    const keys = ['cep', 'zipCode', 'zip', 'postalCode'];
+    for (final key in keys) {
+      final raw = map[key];
+      if (raw == null) continue;
+      final digits = raw.toString().replaceAll(RegExp(r'\D'), '');
+      if (digits.length == 8) {
+        return '${digits.substring(0, 5)}-${digits.substring(5)}';
+      }
+    }
+    return '';
+  }
 
   static Uint8List? _decodeProfileImage(dynamic profileImageData) {
     if (profileImageData == null) return null;
@@ -78,6 +112,7 @@ class Entrepreneur {
     return {
       'id': id,
       'name': name,
+      'companyName': companyName,
       'numberOfAvaliations': numberOfAvaliations,
       'discountPercentage': discountPercentage,
       'address': address,
@@ -96,14 +131,16 @@ class Entrepreneur {
 
   factory Entrepreneur.fromMap(Map<String, dynamic> map) {
     return Entrepreneur(
-      cep: map['cep'],
+      cep: _normalizeCepFromMap(map),
       id: map['entrepreneurId']?.toInt() ?? 0,
-      name: map['name'] ?? '',
+      name: map['name']?.toString() ?? '',
+      companyName: map['companyName']?.toString() ?? '',
       numberOfAvaliations: map['numberOfAvaliations']?.toInt() ?? 0,
       discountPercentage: map['discountPercentage']?.toInt() ?? 0,
       address: map['address'] ?? '',
-      addressNumber: int.parse(map['addressNumber']),
-      cnpj: map['doc'] ?? '',
+      addressNumber: int.tryParse(map['addressNumber']?.toString() ?? '') ?? 0,
+      // API expõe CPF em `doc` ou `document` — não usar como CEP no endereço.
+      cnpj: map['doc']?.toString() ?? map['document']?.toString() ?? '',
       city: map['city'] ?? '',
       state: map['state'] ?? '',
       phone: map['phone'] ?? '',
