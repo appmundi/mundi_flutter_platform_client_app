@@ -9,6 +9,7 @@ class Schedule {
   String cep;
   String entrepreneurPhone;
   String? status;
+  bool optionwork;
 
   Schedule(
       {required this.id,
@@ -18,9 +19,17 @@ class Schedule {
       required this.status,
       required this.modality,
       required this.cep,
-      required this.entrepreneurPhone});
+      required this.entrepreneurPhone,
+      this.optionwork = false});
 
   factory Schedule.fromMap(Map<String, dynamic> map) {
+    final rawOptionwork = map['entrepreneur']['optionwork'];
+    final optionwork = rawOptionwork != null
+        ? rawOptionwork is int
+            ? rawOptionwork == 1
+            : rawOptionwork as bool
+        : false;
+
     return Schedule(
         id: map['id'],
         userUserId: map['user']['userId'],
@@ -29,11 +38,12 @@ class Schedule {
         status: map['status'],
         cep: map['entrepreneur']['cep'],
         modality: Modality.fromMap(map['modality']),
-        entrepreneurPhone: map['entrepreneur']['phone']);
+        entrepreneurPhone: map['entrepreneur']['phone'],
+        optionwork: optionwork);
   }
 
   @override
   String toString() {
-    return 'Schedule{id: $id, scheduledDate: $scheduledDate, userUserId: $userUserId, entrepreneurEntrepreneurId: $entrepreneurEntrepreneurId, modality: $modality, cep: $cep, entrepreneurPhone: $entrepreneurPhone, status: $status}';
+    return 'Schedule{id: $id, scheduledDate: $scheduledDate, userUserId: $userUserId, entrepreneurEntrepreneurId: $entrepreneurEntrepreneurId, modality: $modality, cep: $cep, entrepreneurPhone: $entrepreneurPhone, status: $status, optionwork: $optionwork}';
   }
 }

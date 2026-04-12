@@ -474,13 +474,37 @@ class _SchedulesPageState extends State<SchedulesPage> {
                                       },
                                       label: 'Mais informações',
                                     ),
-                                    SchedulesOutlineButton(
-                                      onPressed: () {
-                                        _getCoordinatesFromAddress(
-                                            sortedSchedules[index].cep);
-                                      },
-                                      label: 'Como chegar',
-                                    ),
+                                    if (!sortedSchedules[index].optionwork)
+                                      SchedulesOutlineButton(
+                                        onPressed: () {
+                                          _getCoordinatesFromAddress(
+                                              sortedSchedules[index].cep);
+                                        },
+                                        label: 'Como chegar',
+                                      )
+                                    else
+                                      Padding(
+                                        padding: const EdgeInsets.only(right: 4),
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.home_outlined,
+                                              size: 16,
+                                              color: Colors.grey[600],
+                                            ),
+                                            const SizedBox(width: 6),
+                                            Text(
+                                              'Prestador irá até você',
+                                              style: TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey[600],
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
                                   ],
                                 ),
                                 const SizedBox(height: 30),
