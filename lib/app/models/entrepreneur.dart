@@ -159,8 +159,8 @@ class Entrepreneur {
               )
               : null,
       distance: double.parse(map['distance'] ?? "0.0"),
-      latitude: map['latitude'].toDouble() ?? 0.0,
-      longitude: map['longitude'].toDouble() ?? 0.0,
+      latitude: (map['latitude'] as num?)?.toDouble() ?? 0.0,
+      longitude: (map['longitude'] as num?)?.toDouble() ?? 0.0,
       profileImage: _decodeProfileImage(map['profileImage']),
       imagesID:
           ((map['images'] as List?) ?? []).map((item) => item as int).toList(),

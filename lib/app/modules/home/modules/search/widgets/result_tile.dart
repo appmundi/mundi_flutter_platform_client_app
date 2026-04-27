@@ -216,7 +216,9 @@ class _ResultTileState extends State<ResultTile> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              "${widget.entrepreneur!.distance?.toStringAsFixed(2)} km",
+              widget.entrepreneur!.distance != null
+                  ? "${widget.entrepreneur!.distance!.toStringAsFixed(1)} km"
+                  : "Localização não informada",
               style: context.textStyles.textRegular.copyWith(
                 fontSize: 14,
                 color: const Color.fromRGBO(113, 113, 113, 1),
