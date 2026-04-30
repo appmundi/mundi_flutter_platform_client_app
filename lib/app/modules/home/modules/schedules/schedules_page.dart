@@ -477,8 +477,18 @@ class _SchedulesPageState extends State<SchedulesPage> {
                                     if (!sortedSchedules[index].optionwork)
                                       SchedulesOutlineButton(
                                         onPressed: () {
-                                          _getCoordinatesFromAddress(
-                                              sortedSchedules[index].cep);
+                                          final schedule = sortedSchedules[index];
+                                          if (schedule.hasValidCoordinates) {
+                                            _showMapSelectionDialog(
+                                              schedule.entrepreneurLatitude,
+                                              schedule.entrepreneurLongitude,
+                                            );
+                                          } else {
+                                            final fallbackAddr = schedule.entrepreneurAddress.isNotEmpty
+                                                ? schedule.entrepreneurAddress
+                                                : schedule.cep;
+                                            _getCoordinatesFromAddress(fallbackAddr);
+                                          }
                                         },
                                         label: 'Como chegar',
                                       )
@@ -535,20 +545,77 @@ class _SchedulesPageState extends State<SchedulesPage> {
     try {
       List<Location> locations = await locationFromAddress(address);
       if (locations.isNotEmpty) {
-        Location location = locations.first;
-        // Agora chama o dialog de seleção ao invés de tentar abrir diretamente
+        final location = locations.first;
         await _showMapSelectionDialog(location.latitude, location.longitude);
+      } else {
+        await _showMapSelectionDialogByAddress(address);
       }
     } catch (e) {
-      print('Error: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao obter coordenadas do endereço: $e'),
-            backgroundColor: Colors.red,
+      print('Error geocoding address: $e');
+      await _showMapSelectionDialogByAddress(address);
+    }
+  }
+
+  Future<void> _showMapSelectionDialogByAddress(String address) async {
+    final encoded = Uri.encodeComponent(address);
+    final selectedOption = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        final mapOptions = _getMapOptions();
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Como chegar',
+                    style: context.textStyles.titleBold.copyWith(fontSize: 18)),
+                const SizedBox(height: 8),
+                Text(address,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                const SizedBox(height: 24),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 16,
+                  children: mapOptions.map((option) => _buildMapOption(
+                    icon: option['icon'],
+                    label: option['label'],
+                    color: option['color'],
+                    onTap: () => Navigator.of(context).pop(option['type']),
+                  )).toList(),
+                ),
+                const SizedBox(height: 24),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('Cancelar',
+                      style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w500)),
+                ),
+              ],
+            ),
           ),
         );
-      }
+      },
+    );
+
+    if (selectedOption == null || !mounted) return;
+
+    final String url;
+    switch (selectedOption) {
+      case 'waze':
+        url = 'waze://?q=$encoded&navigate=yes';
+        break;
+      case 'google':
+        url = 'https://www.google.com/maps/search/?api=1&query=$encoded';
+        break;
+      case 'apple':
+        url = 'http://maps.apple.com/?q=$encoded';
+        break;
+      default:
+        return;
     }
+
+    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
   }
 }
