@@ -100,7 +100,7 @@ class _EntrepreneurTileState extends State<EntrepreneurTile> {
         ),
         const SizedBox(height: 5),
         Text(
-          widget.entrepreneur!.name,
+          widget.entrepreneur!.displayName,
           style: context.textStyles.titleBold.copyWith(
             color: Colors.black,
             fontSize: 16,
@@ -109,9 +109,12 @@ class _EntrepreneurTileState extends State<EntrepreneurTile> {
         const SizedBox(height: 5),
         Text(
           widget.entrepreneur!.fullAddress,
+          softWrap: true,
+          maxLines: 8,
           style: context.textStyles.textRegular.copyWith(
             fontSize: 10,
             color: const Color(0xFFA4A4A4),
+            height: 1.35,
           ),
         ),
       ],

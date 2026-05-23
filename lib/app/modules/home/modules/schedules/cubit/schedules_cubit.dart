@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/feedback.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/ui/extension/date_time_extension.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/schedules/cubit/schedules_state.dart';
 
 import '../../../../../models/schedule.dart';
@@ -16,21 +17,48 @@ class ScheduleCubit extends Cubit<ScheduleState> {
   }
 
   Future<void> applyFilter(String filterText) async {
-    print('apply');
     try {
       emit(state.copyWith(status: ScheduleStatus.loading));
 
-      final newList = state.schedules!.where((Schedule element) {
+      // Se o texto do filtro estiver vazio, volta a lista original
+      if (filterText.trim().isEmpty) {
+        final originalList = state.schedules ?? <Schedule>[];
+
+        originalList.sort(
+          (a, b) => a.scheduledDate.apiDateMinusThreeHours.compareTo(
+            b.scheduledDate.apiDateMinusThreeHours,
+          ),
+        );
+
+        emit(
+          state.copyWith(
+            scheduleFiltered: originalList,
+            status: ScheduleStatus.success,
+          ),
+        );
+        return;
+      }
+
+      final baseList = state.schedules ?? <Schedule>[];
+
+      final newList = baseList.where((Schedule element) {
         return element.modality.title
             .toLowerCase()
             .contains(filterText.toString().toLowerCase());
       }).toList();
 
-      newList.sort((a, b) => DateTime.parse(a.scheduledDate).compareTo(DateTime.parse(b.scheduledDate)));
+      newList.sort(
+        (a, b) => a.scheduledDate.apiDateMinusThreeHours.compareTo(
+          b.scheduledDate.apiDateMinusThreeHours,
+        ),
+      );
 
-      print(newList);
-
-      emit(state.copyWith(scheduleFiltered: newList, schedules: newList, status: ScheduleStatus.success));
+      emit(
+        state.copyWith(
+          scheduleFiltered: newList,
+          status: ScheduleStatus.success,
+        ),
+      );
     } catch (e) {
       state.copyWith(scheduleFiltered: state.schedules);
     }

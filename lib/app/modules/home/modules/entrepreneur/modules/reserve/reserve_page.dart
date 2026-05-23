@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -16,10 +15,8 @@ import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/reserve_mo
 import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/reserve_tile.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/entrepreneur.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/modality.dart';
-import 'package:mundi_flutter_platform_client_app/app/models/reservation.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/entrepreneur/modules/reserve/widgets/add_services_dialog.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/entrepreneur/modules/reserve/widgets/text_area.dart';
-import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/schedules/widgets/schedules_search_text_field.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 
 import 'cubit/reserve_cubit.dart';
@@ -371,102 +368,99 @@ class _ReservePageState extends State<ReservePage> with Messages<ReservePage> {
         ),
         body: Stack(
           children: [
-            SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                child: Column(
-                  children: [
-                    SizedBox(
-                      height: 30,
-                      child: Center(
-                        child: Row(
-                          children: [
-                            InkWell(
-                              onTap: () {
-                                Modular.to.pop();
-                              },
-                              child: Icon(
-                                Icons.arrow_back_ios,
-                                color: context.colors.secondary,
-                                size: 20,
-                              ),
-                            ),
-                            const SizedBox(width: 5),
-                            Text(
-                              "Fazer uma reserva",
-                              style: context.textStyles.titleBold.copyWith(
-                                color: context.colors.primary,
-                                fontSize: 20,
-                                height: .7,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Center(
-                      child: Text(
-                        DateTime.now().year.toString(),
-                        style: context.textStyles.titleBold.copyWith(
-                          fontSize: 16,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    CalendarPicker(
-                      controller: _dateController,
-                      minDate: DateTime.now(),
-                      onSelectionChanged: (args) {
-                        _loadAvailableTimes();
-                      },
-                    ),
-                    const SizedBox(height: 20),
-                    AvailableTimesInput(
-                      availablesTimes: availablesTimes,
-                      onSelectTime: (time) {
-                        setState(() {
-                          selectedTime = time;
-                        });
-                      },
-                      selectedTime: selectedTime,
-                    ),
-                    const SizedBox(height: 30),
-                    ReserveTile(
-                      modality: widget.reservePageArguments.modality,
-                      selectedTime: selectedTime,
-                      selectedDate: _dateController.selectedDate!,
-                    ),
-                    const SizedBox(height: 30),
-                    GestureDetector(
-                      onTap: onAddModalities,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Icon(
-                            Icons.add,
-                            size: 25,
+            ListView(
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20)
+                  .copyWith(bottom: 120),
+              children: [
+                SizedBox(
+                  height: 30,
+                  child: Center(
+                    child: Row(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            Modular.to.pop();
+                          },
+                          child: Icon(
+                            Icons.arrow_back_ios,
                             color: context.colors.secondary,
+                            size: 20,
                           ),
-                          _buildAdditionalModalitiesContainer(),
-                        ],
-                      ),
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          "Fazer uma reserva",
+                          style: context.textStyles.titleBold.copyWith(
+                            color: context.colors.primary,
+                            fontSize: 20,
+                            height: .7,
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 20),
-
-                    // Campos de endereço (apenas se entrepreneur.optionwork == 1)
-                    if (entrepreneur.optionwork) ...[
-                      _buildAddressFields(),
-                    ],
-
-                    TextArea(controller: descriptionController),
-                    const SizedBox(height: 80),
-                  ],
+                  ),
                 ),
-              ),
+                const SizedBox(height: 20),
+                Center(
+                  child: Text(
+                    DateTime.now().year.toString(),
+                    style: context.textStyles.titleBold.copyWith(
+                      fontSize: 16,
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                CalendarPicker(
+                  controller: _dateController,
+                  minDate: DateTime.now(),
+                  onSelectionChanged: (args) {
+                    _loadAvailableTimes();
+                  },
+                ),
+                const SizedBox(height: 20),
+                AvailableTimesInput(
+                  availablesTimes: availablesTimes,
+                  onSelectTime: (time) {
+                    setState(() {
+                      selectedTime = time;
+                    });
+                  },
+                  selectedTime: selectedTime,
+                ),
+                const SizedBox(height: 30),
+                ReserveTile(
+                  modality: widget.reservePageArguments.modality,
+                  selectedTime: selectedTime,
+                  selectedDate: _dateController.selectedDate!,
+                ),
+                const SizedBox(height: 30),
+                GestureDetector(
+                  onTap: onAddModalities,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Icon(
+                        Icons.add,
+                        size: 25,
+                        color: context.colors.secondary,
+                      ),
+                      _buildAdditionalModalitiesContainer(),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                // Campos de endereço (apenas se entrepreneur.optionwork == 1)
+                if (entrepreneur.optionwork) ...[
+                  _buildAddressFields(),
+                ],
+
+                TextArea(controller: descriptionController),
+                const SizedBox(height: 20),
+              ],
             ),
             Positioned(
-              bottom: 0,
+              bottom: 20,
               child: Container(
                 width: 1.sw,
                 padding: const EdgeInsets.symmetric(
@@ -521,12 +515,15 @@ class _ReservePageState extends State<ReservePage> with Messages<ReservePage> {
                         final [hour, minute] =
                             selectedTime.getHourAndMinuteFromAppTimeFormat;
 
+                        // Monta data/hora no formato local selecionado pelo usuário
+                        final localDateTime = _dateController.selectedDate!
+                            .fillHourAndMinute(hour, minute);
+
                         ReadContext(context).read<ReserveCubit>().createReserve(
                           entrepreneurId: widget.reservePageArguments.entrepreneurId,
                           modalityIds: modalities.map((modality) => modality.id).toList(),
-                          scheduledDate: _dateController.selectedDate!
-                              .fillHourAndMinute(hour, minute)
-                              .toIso8601String(),
+                          // Envia sempre em UTC para evitar variação por timezone do servidor
+                          scheduledDate: localDateTime.toUtc().toIso8601String(),
                           description: descriptionController.text,
                           address: entrepreneur.optionwork ? {
                             'number': numberController.text.trim(),

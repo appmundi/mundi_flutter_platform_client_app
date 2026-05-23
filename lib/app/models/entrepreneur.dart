@@ -7,6 +7,8 @@ import 'package:mundi_flutter_platform_client_app/app/models/work.dart';
 class Entrepreneur {
   final int id;
   final String name;
+  /// Nome fantasia / empresa (API: companyName).
+  final String companyName;
   final int numberOfAvaliations;
   final int discountPercentage;
   final String address;
@@ -27,10 +29,12 @@ class Entrepreneur {
   final List<Category> category;
   final double longitude;
   final double latitude;
+  final String? description;
 
   Entrepreneur({
     required this.id,
     required this.name,
+    this.companyName = '',
     required this.address,
     required this.addressNumber,
     required this.city,
@@ -51,15 +55,64 @@ class Entrepreneur {
     this.imagesID,
     this.optionwork = false,
     required this.category,
+    this.description,
   });
 
-  String get fullAddress =>
-      "$address, $addressNumber,\n$city - ${state.replaceAll('State of', '')}, $cnpj";
+  /// Nome exibido ao cliente: empresa, se existir; senão o nome do responsável.
+  String get displayName {
+    final c = companyName.trim();
+    return c.isNotEmpty ? c : name;
+  }
+
+  String get fullAddress {
+    final stateFmt = state.replaceAll('State of', '').trim();
+    final cepFmt = cep.trim();
+    final parts = <String>[
+      '$address, $addressNumber',
+      '$city - $stateFmt',
+    ];
+    // `cep` já vem só como 8 dígitos formatados (00000-000); evita repetir texto de endereço.
+    if (cepFmt.isNotEmpty) {
+      parts.add('CEP $cepFmt');
+    }
+    return parts.join('\n');
+  }
+
+  /// Extrai só a sequência numérica do CEP (8 dígitos). Ignora texto que não seja CEP.
+  static String _normalizeCepFromMap(Map<String, dynamic> map) {
+    const keys = ['cep', 'zipCode', 'zip', 'postalCode'];
+    for (final key in keys) {
+      final raw = map[key];
+      if (raw == null) continue;
+      final digits = raw.toString().replaceAll(RegExp(r'\D'), '');
+      if (digits.length == 8) {
+        return '${digits.substring(0, 5)}-${digits.substring(5)}';
+      }
+    }
+    return '';
+  }
+
+  static Uint8List? _decodeProfileImage(dynamic profileImageData) {
+    if (profileImageData == null) return null;
+    
+    final profileImageString = profileImageData as String?;
+    if (profileImageString == null || profileImageString.isEmpty) {
+      return null;
+    }
+    
+    try {
+      return profileImageString.bytesFromBase64;
+    } catch (e) {
+      print('Erro ao decodificar profileImage: $e');
+      return null;
+    }
+  }
 
   Map<String, dynamic> toMap() {
     return {
       'id': id,
       'name': name,
+      'companyName': companyName,
       'numberOfAvaliations': numberOfAvaliations,
       'discountPercentage': discountPercentage,
       'address': address,
@@ -78,14 +131,16 @@ class Entrepreneur {
 
   factory Entrepreneur.fromMap(Map<String, dynamic> map) {
     return Entrepreneur(
-      cep: map['cep'],
+      cep: _normalizeCepFromMap(map),
       id: map['entrepreneurId']?.toInt() ?? 0,
-      name: map['name'] ?? '',
+      name: map['name']?.toString() ?? '',
+      companyName: map['companyName']?.toString() ?? '',
       numberOfAvaliations: map['numberOfAvaliations']?.toInt() ?? 0,
       discountPercentage: map['discountPercentage']?.toInt() ?? 0,
       address: map['address'] ?? '',
-      addressNumber: int.parse(map['addressNumber']),
-      cnpj: map['doc'] ?? '',
+      addressNumber: int.tryParse(map['addressNumber']?.toString() ?? '') ?? 0,
+      // API expõe CPF em `doc` ou `document` — não usar como CEP no endereço.
+      cnpj: map['doc']?.toString() ?? map['document']?.toString() ?? '',
       city: map['city'] ?? '',
       state: map['state'] ?? '',
       phone: map['phone'] ?? '',
@@ -104,9 +159,9 @@ class Entrepreneur {
               )
               : null,
       distance: double.parse(map['distance'] ?? "0.0"),
-      latitude: map['latitude'].toDouble() ?? 0.0,
-      longitude: map['longitude'].toDouble() ?? 0.0,
-      profileImage: (map['profileImage'] as String?)?.bytesFromBase64,
+      latitude: (map['latitude'] as num?)?.toDouble() ?? 0.0,
+      longitude: (map['longitude'] as num?)?.toDouble() ?? 0.0,
+      profileImage: _decodeProfileImage(map['profileImage']),
       imagesID:
           ((map['images'] as List?) ?? []).map((item) => item as int).toList(),
       optionwork:
@@ -121,6 +176,7 @@ class Entrepreneur {
               : map['category']
                   .map<Category>((x) => Category.fromMap(x))
                   .toList(),
+      description: map['description'],
     );
   }
 
@@ -170,7 +226,10 @@ class Category {
   Category({required this.id, this.type = "Barbearia"});
 
   factory Category.fromMap(Map<String, dynamic> data) {
-    return Category(id: data['id'], type: data['type']);
+    return Category(
+      id: data['id'] is int ? data['id'] as int : int.tryParse(data['id']?.toString() ?? '0') ?? 0,
+      type: data['type']?.toString() ?? 'Barbearia',
+    );
   }
 
   factory Category.fromJson(String source) =>

@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.2
+version: 1.0.0+4
 
 environment:
   sdk: ^3.7.0
@@ -38,7 +38,7 @@ dependencies:
   http: ^1.2.1
   blurrycontainer: ^2.1.0
   themed: ^5.0.3
-  firebase_core: ^2.31.0
+  firebase_core: ^3.14.0
   flutter_screenutil: ^5.9.0
   flutter_map: ^6.1.0
   latlong2: ^0.9.1
@@ -46,14 +46,14 @@ dependencies:
   flutter_typeahead: ^5.2.0
   mask_text_input_formatter: ^2.9.0
   scrollable_clean_calendar: ^1.5.0
-  syncfusion_flutter_datepicker: ^25.2.3
+  syncfusion_flutter_datepicker: ^32.1.23
   bloc: ^8.1.4
   flutter_rating_bar: ^4.0.1
   dio: ^5.4.3+1
   validatorless: ^1.2.3
   equatable: ^2.0.5
   top_snackbar_flutter: ^3.1.0
-  cloud_firestore: ^4.17.3
+  cloud_firestore: ^5.0.0
   jwt_decoder: ^2.0.1
   geocoding: ^3.0.0
   search_cep: ^4.0.2
@@ -70,6 +70,8 @@ dependencies:
   flutter_material_design_icons: ^1.1.7447
   geolocator: ^14.0.2
   timezone: ^0.10.1
+  app_links: ^6.3.4
+  share_plus: ^12.0.1
 
 dev_dependencies:
   flutter_test:
@@ -78,6 +80,7 @@ dev_dependencies:
     sdk: flutter
   build_runner: ^2.3.2
   match_generator: ^0.4.2
+  flutter_launcher_icons: ^0.14.4
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -85,6 +88,12 @@ dev_dependencies:
   # package. See that file for information about deactivating specific lint
   # rules and activating additional ones.
   flutter_lints: ^2.0.0
+
+flutter_launcher_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/images/logo-app.jpg"
+  min_sdk_android: 21
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec

@@ -12,6 +12,11 @@ class AddressRepository implements IAddressRepository {
       final position = await _myLocation();
 
       for (Entrepreneur entrepreneur in entrepreneurs) {
+        if (entrepreneur.latitude == 0.0 && entrepreneur.longitude == 0.0) {
+          entrepreneur.distance = null;
+          continue;
+        }
+
         final distance = Geolocator.distanceBetween(
           position.latitude,
           position.longitude,

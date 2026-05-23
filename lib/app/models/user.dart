@@ -31,7 +31,7 @@ class User {
       'name': name,
       'email': email,
       'password': password,
-      'doc': doc.replaceAll(".", "").replaceAll("-", ""),
+      'doc': doc.replaceAll(RegExp(r'\D'), ''),
       'phone': phone
           .replaceAll("(", "")
           .replaceAll(")", "")

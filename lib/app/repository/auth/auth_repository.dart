@@ -19,12 +19,22 @@ class AuthRepository implements IAuthRepository {
     : _rest = rest,
       localStorage = LocalStorage;
 
+  String _normalizeLoginIdentifier(String value) {
+    final v = value.trim();
+    if (v.contains('@')) return v;
+    return v.replaceAll(RegExp(r'\D'), '');
+  }
+
   @override
   Future<String> login(String email, String password) async {
     try {
       final response = await _rest.post(
         "/user/login",
-        data: {'email': email, 'password': password, "isEntrepreneur": false},
+        data: {
+          'email': _normalizeLoginIdentifier(email),
+          'password': password,
+          "isEntrepreneur": false,
+        },
         headers: {'Content-Type': 'application/json'},
       );
       if (response.statusCode == 401) {
@@ -211,6 +221,41 @@ class AuthRepository implements IAuthRepository {
         throw InvalidFieldException();
       }
     } on DioException {
+      throw ConnectionException(
+        errorMessage: "Erro ao conectar-se com o Servidor",
+      );
+    }
+  }
+
+  @override
+  Future<void> deleteAccount(int userId) async {
+    try {
+      final token = await localStorage.read('accessToken');
+      if (token == null || token.isEmpty) {
+        throw InvalidFieldException(exception: 'Sessão expirada');
+      }
+
+      print('[FLUTTER PLATFORM CLIENT] deleteAccount: userId=$userId, tokenExists=${token.isNotEmpty}');
+      final response = await _rest.delete(
+        "/user/$userId",
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      print('[FLUTTER PLATFORM CLIENT] deleteAccount response: statusCode=${response.statusCode}, data=${response.data}');
+      if (response.statusCode == 401) {
+        throw InvalidFieldException();
+      }
+      if (response.statusCode != 200 && response.statusCode != 204) {
+        throw ConnectionException(
+          errorMessage: "Erro ao excluir a conta",
+        );
+      }
+    } on DioException catch (e) {
+      print('[FLUTTER PLATFORM CLIENT] deleteAccount DioException: $e');
+      print('[FLUTTER PLATFORM CLIENT] response: ${e.response?.statusCode} ${e.response?.data}');
       throw ConnectionException(
         errorMessage: "Erro ao conectar-se com o Servidor",
       );

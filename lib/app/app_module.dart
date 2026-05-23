@@ -6,6 +6,8 @@ import 'package:mundi_flutter_platform_client_app/app/core/rest/rest_client.dart
 import 'package:mundi_flutter_platform_client_app/app/core/storage/local_storage.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/storage/shared_preferences/sp_local_storage.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/auth/auth_module.dart';
+import 'package:mundi_flutter_platform_client_app/app/repository/category/category_repository.dart';
+import 'package:mundi_flutter_platform_client_app/app/repository/category/i_category_repository.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/profile/modules/details/details_profile_module.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/profile/profile_module.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/splash/splash_module.dart';
@@ -16,14 +18,18 @@ class AppModule extends Module {
   void exportedBinds(Injector i) {
     i.addLazySingleton<LocalStorage>(SpLocalStorage.new);
     i.addLazySingleton<RestClient>(CustomDio.new);
-
+    i.addLazySingleton<ICategoryRepository>(
+      () => CategoryRepository(rest: Modular.get<RestClient>()),
+    );
   }
 
   @override
   void binds(Injector i) {
     i.addLazySingleton<RestClient>(CustomDio.new);
-
     i.addLazySingleton<LocalStorage>(SpLocalStorage.new);
+    i.addLazySingleton<ICategoryRepository>(
+      () => CategoryRepository(rest: Modular.get<RestClient>()),
+    );
   }
 
   @override

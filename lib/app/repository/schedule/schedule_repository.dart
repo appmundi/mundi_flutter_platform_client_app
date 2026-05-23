@@ -44,7 +44,7 @@ class ScheduleRepository implements IScheduleRepository {
           .map<Schedule>((data) => Schedule.fromMap(data))
           .toList();
 
-      log("Agendamentos > ${schedules.toString()}");
+      log("Agendamentos : ${schedules.toString()}");
 
       return schedules;
     } on RestClientException catch (e, s) {
@@ -68,7 +68,6 @@ class ScheduleRepository implements IScheduleRepository {
       final response =
           await _rest.post('/scheduling/$scheduleId/cancel', headers: headers);
 
-      print(response);
     } catch (e) {
       print("Error ${e.toString()}");
     }

@@ -22,6 +22,8 @@ class EntrepreneurCubit extends Cubit<EntrepreneurState> {
         entrepreneur: entrepreneur,
       ));
     } catch (e) {
+      print(e);
+      print(e.runtimeType);
       emit(
         state.copyWith(
           status: EntrepreneurStateStatus.error,

@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart' hide Feedback;
@@ -21,7 +20,6 @@ import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/sched
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/schedules/widgets/schedule_feedback_modal.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/schedules/widgets/schedules_outline_button.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/schedules/widgets/schedules_search_text_field.dart';
-import 'package:timezone/timezone.dart' hide Location;
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../../../core/ui/widgets/more_info.dart';
@@ -41,12 +39,10 @@ class _SchedulesPageState extends State<SchedulesPage> {
     await context.read<ScheduleCubit>().loadSchedule();
   }
 
-  // Novo método para mostrar o dialog de seleção de mapas
   Future<void> _showMapSelectionDialog(double latitude, double longitude) async {
     final selectedOption = await showDialog<String>(
       context: context,
       builder: (BuildContext context) {
-        // Lista de opções baseada na plataforma
         final mapOptions = _getMapOptions();
 
         return Dialog(
@@ -101,7 +97,6 @@ class _SchedulesPageState extends State<SchedulesPage> {
     }
   }
 
-  // Método para obter as opções de mapa baseado na plataforma
   List<Map<String, dynamic>> _getMapOptions() {
     final options = <Map<String, dynamic>>[
       {
@@ -174,7 +169,6 @@ class _SchedulesPageState extends State<SchedulesPage> {
     );
   }
 
-  // Método para abrir o mapa selecionado
   Future<void> _openSelectedMap(String mapType, double latitude, double longitude) async {
     String url;
 
@@ -193,27 +187,84 @@ class _SchedulesPageState extends State<SchedulesPage> {
     }
 
     try {
-      if (await canLaunchUrl(Uri.parse(url))) {
-        await launchUrl(
-          Uri.parse(url),
-          mode: LaunchMode.externalApplication,
-        );
-      } else {
-        // Se o aplicativo não estiver instalado, mostrar mensagem de erro
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Não foi possível abrir o ${_getMapName(mapType)}. Verifique se está instalado.'),
-              backgroundColor: Colors.red,
-            ),
+      final uri = Uri.parse(url);
+      
+      // No iOS, canLaunchUrl não funciona bem para URL schemes customizados
+      // mesmo quando estão no Info.plist. Tentamos abrir diretamente.
+      if (Platform.isIOS) {
+        try {
+          final launched = await launchUrl(
+            uri,
+            mode: LaunchMode.externalApplication,
           );
+          
+          if (!launched) {
+            // Se não conseguiu abrir e é o Waze, oferece instalar
+            if (mapType == 'waze' && mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: const Text('Waze não está instalado. Abrindo App Store...'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+              await launchUrl(
+                Uri.parse('https://apps.apple.com/app/id323229106'),
+                mode: LaunchMode.externalApplication,
+              );
+            } else if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Não foi possível abrir o ${_getMapName(mapType)}.'),
+                  backgroundColor: Colors.red,
+                ),
+              );
+            }
+          }
+        } catch (e) {
+          // Se der erro ao tentar abrir Waze, oferece instalar
+          if (mapType == 'waze' && mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Text('Waze não está instalado. Abrindo App Store...'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+            await launchUrl(
+              Uri.parse('https://apps.apple.com/app/id323229106'),
+              mode: LaunchMode.externalApplication,
+            );
+          } else if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Erro ao abrir ${_getMapName(mapType)}: ${e.toString()}'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
+        }
+      } else {
+        // Android: verifica antes de tentar abrir
+        if (await canLaunchUrl(uri)) {
+          await launchUrl(
+            uri,
+            mode: LaunchMode.externalApplication,
+          );
+        } else {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Não foi possível abrir o ${_getMapName(mapType)}. Verifique se está instalado.'),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
         }
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erro ao abrir o aplicativo de mapas: $e'),
+            content: Text('Erro ao abrir o aplicativo de mapas: ${e.toString()}'),
             backgroundColor: Colors.red,
           ),
         );
@@ -221,7 +272,6 @@ class _SchedulesPageState extends State<SchedulesPage> {
     }
   }
 
-  // Método auxiliar para obter o nome do aplicativo de mapas
   String _getMapName(String mapType) {
     switch (mapType) {
       case 'waze':
@@ -307,11 +357,10 @@ class _SchedulesPageState extends State<SchedulesPage> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        // Ordenar a lista filtrada por data
         List<Schedule> sortedSchedules = List.from(state.scheduleFiltered);
         sortedSchedules.sort((a, b) {
-          DateTime dateA = DateTime.parse(a.scheduledDate);
-          DateTime dateB = DateTime.parse(b.scheduledDate);
+          DateTime dateA = a.scheduledDate.apiDateMinusThreeHours;
+          DateTime dateB = b.scheduledDate.apiDateMinusThreeHours;
           return dateA.compareTo(dateB);
         });
 
@@ -325,7 +374,7 @@ class _SchedulesPageState extends State<SchedulesPage> {
             centerTitle: false,
           ),
           body: RefreshIndicator(
-            onRefresh: _refreshSchedules, // Adicionando pull-to-refresh
+            onRefresh: _refreshSchedules,
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Column(
@@ -359,9 +408,6 @@ class _SchedulesPageState extends State<SchedulesPage> {
 
                     },
                   ),
-                  const SizedBox(
-                    height: 15,
-                  ),
 
                   Visibility(
                     visible: sortedSchedules.isNotEmpty,
@@ -371,13 +417,13 @@ class _SchedulesPageState extends State<SchedulesPage> {
                     child: Expanded(
                       child: ListView.separated(
                         separatorBuilder: (context, index) =>
-                        const SizedBox(height: 10),
+                        const SizedBox(height: 2),
                         physics: const AlwaysScrollableScrollPhysics(),
                         shrinkWrap: true,
                         itemCount: sortedSchedules.length,
                         itemBuilder: (context, index) {
-                          TZDateTime scheduledDate = TZDateTime.from(DateTime.parse(
-                              sortedSchedules[index].scheduledDate), local);
+                          final scheduledDate =
+                              sortedSchedules[index].scheduledDate.apiDateMinusThreeHours;
 
                           final currentDate = DateTime.now();
                           final currentDateWithoutTime = DateTime(
@@ -415,9 +461,9 @@ class _SchedulesPageState extends State<SchedulesPage> {
                                                 .userUserId,
                                             modality:
                                             sortedSchedules[index].modality,
-                                            startAt: DateTime.parse(
-                                                sortedSchedules[index]
-                                                    .scheduledDate),
+                                            startAt: sortedSchedules[index]
+                                                .scheduledDate
+                                                .apiDateMinusThreeHours,
                                             entrepreneurPhone:
                                             sortedSchedules[index]
                                                 .entrepreneurPhone,
@@ -431,8 +477,18 @@ class _SchedulesPageState extends State<SchedulesPage> {
                                     if (!sortedSchedules[index].optionwork)
                                       SchedulesOutlineButton(
                                         onPressed: () {
-                                          _getCoordinatesFromAddress(
-                                              sortedSchedules[index].cep);
+                                          final schedule = sortedSchedules[index];
+                                          if (schedule.hasValidCoordinates) {
+                                            _showMapSelectionDialog(
+                                              schedule.entrepreneurLatitude,
+                                              schedule.entrepreneurLongitude,
+                                            );
+                                          } else {
+                                            final fallbackAddr = schedule.entrepreneurAddress.isNotEmpty
+                                                ? schedule.entrepreneurAddress
+                                                : schedule.cep;
+                                            _getCoordinatesFromAddress(fallbackAddr);
+                                          }
                                         },
                                         label: 'Como chegar',
                                       )
@@ -489,20 +545,77 @@ class _SchedulesPageState extends State<SchedulesPage> {
     try {
       List<Location> locations = await locationFromAddress(address);
       if (locations.isNotEmpty) {
-        Location location = locations.first;
-        // Agora chama o dialog de seleção ao invés de tentar abrir diretamente
+        final location = locations.first;
         await _showMapSelectionDialog(location.latitude, location.longitude);
+      } else {
+        await _showMapSelectionDialogByAddress(address);
       }
     } catch (e) {
-      print('Error: $e');
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao obter coordenadas do endereço: $e'),
-            backgroundColor: Colors.red,
+      print('Error geocoding address: $e');
+      await _showMapSelectionDialogByAddress(address);
+    }
+  }
+
+  Future<void> _showMapSelectionDialogByAddress(String address) async {
+    final encoded = Uri.encodeComponent(address);
+    final selectedOption = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        final mapOptions = _getMapOptions();
+        return Dialog(
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text('Como chegar',
+                    style: context.textStyles.titleBold.copyWith(fontSize: 18)),
+                const SizedBox(height: 8),
+                Text(address,
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 12, color: Colors.grey[600])),
+                const SizedBox(height: 24),
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  spacing: 16,
+                  children: mapOptions.map((option) => _buildMapOption(
+                    icon: option['icon'],
+                    label: option['label'],
+                    color: option['color'],
+                    onTap: () => Navigator.of(context).pop(option['type']),
+                  )).toList(),
+                ),
+                const SizedBox(height: 24),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: Text('Cancelar',
+                      style: TextStyle(color: Colors.grey[600], fontWeight: FontWeight.w500)),
+                ),
+              ],
+            ),
           ),
         );
-      }
+      },
+    );
+
+    if (selectedOption == null || !mounted) return;
+
+    final String url;
+    switch (selectedOption) {
+      case 'waze':
+        url = 'waze://?q=$encoded&navigate=yes';
+        break;
+      case 'google':
+        url = 'https://www.google.com/maps/search/?api=1&query=$encoded';
+        break;
+      case 'apple':
+        url = 'http://maps.apple.com/?q=$encoded';
+        break;
+      default:
+        return;
     }
+
+    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
   }
 }

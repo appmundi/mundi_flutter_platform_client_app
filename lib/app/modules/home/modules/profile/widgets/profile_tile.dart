@@ -14,17 +14,23 @@ class ProfileTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final imageUrl =
-        "${Environments.get('BASE_URL')}/images/profile/user/$userId?t=${DateTime.now().millisecondsSinceEpoch}";
+    final hasValidUserId = userId > 0;
+    final imageUrl = hasValidUserId
+        ? "${Environments.get('BASE_URL')}/images/profile/user/$userId?t=${DateTime.now().millisecondsSinceEpoch}"
+        : null;
 
     return Row(
       children: [
         CircleAvatar(
           radius: 22.5,
-          backgroundImage: NetworkImage(imageUrl),
-          onBackgroundImageError: (_, __) {
-            // Se der erro ao carregar, mantém avatar padrão
-          },
+          backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
+          onBackgroundImageError: imageUrl != null ? (_, __) {} : null,
+          child: imageUrl == null
+              ? Text(
+                  name.isNotEmpty ? name[0].toUpperCase() : "?",
+                  style: const TextStyle(fontSize: 20),
+                )
+              : null,
         ),
         const SizedBox(width: 10),
         Text(
