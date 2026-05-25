@@ -1,36 +1,27 @@
 #!/bin/sh
 
+# Falha imediatamente em caso de erro
 set -e
+
+# Define o locale para evitar problemas de encoding com o CocoaPods
+export LANG=en_US.UTF-8
 
 cd $CI_PRIMARY_REPOSITORY_PATH
 
-# Install Flutter
-git clone https://github.com/flutter/flutter.git --depth 1 -b stable $HOME/flutter
+# Instala o Flutter
+git clone https://github.com/flutter/flutter.git --depth 1 -b 3.41.9 $HOME/flutter
 export PATH="$PATH:$HOME/flutter/bin"
 
+# Faz o pré-cache dos artefatos do iOS
 flutter precache --ios
 
-# Clean flutter
-flutter clean
-
-# Dependencies
+# Baixa as dependências do Flutter
 flutter pub get
 
-# CocoaPods
-HOMEBREW_NO_AUTO_UPDATE=1
-brew install cocoapods
+# Instala o CocoaPods usando o Homebrew
+HOMEBREW_NO_AUTO_UPDATE=1 brew install cocoapods
 
-cd ios
-
-# CLEAN PODS
-rm -rf Pods
-rm -rf .symlinks
-rm -rf Flutter/Flutter.framework
-rm -rf Flutter/Flutter.podspec
-rm -f Podfile.lock
-
-# Reinstall pods
-pod repo update
-pod install
+# Entra na pasta ios e instala os Pods nativos
+cd ios && pod install
 
 exit 0
