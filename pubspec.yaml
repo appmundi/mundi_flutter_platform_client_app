@@ -67,11 +67,14 @@ dependencies:
   flutter_rating_stars: ^1.1.0
   image_picker: ^1.2.0
   shimmer: ^3.0.0
-  flutter_material_design_icons: ^1.1.7447
+  flutter_material_design_icons: ^3.1.0+7447
   geolocator: ^14.0.2
   timezone: ^0.10.1
   app_links: ^6.3.4
   share_plus: ^12.0.1
+  awesome_notifications: ^0.10.1
+  awesome_notifications_fcm: ^0.10.1
+  get_it: ^7.7.0
 
 dev_dependencies:
   flutter_test:

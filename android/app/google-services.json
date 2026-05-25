@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "316227259990",
+    "project_id": "mundi-fe748",
+    "storage_bucket": "mundi-fe748.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:316227259990:android:342d53b9bab021baf5f5f7",
+        "android_client_info": {
+          "package_name": "br.com.mundi.mundi_client_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDML7aVVaS6DENtTuhp2acG9dUrIUeuteA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

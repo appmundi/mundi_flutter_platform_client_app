@@ -12,8 +12,12 @@ import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/profi
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/profile/profile_module.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/splash/splash_module.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/home_module.dart';
+import 'package:mundi_flutter_platform_client_app/app/modules/notifications/notifications_module.dart';
 
 class AppModule extends Module {
+  @override
+  List<Module> get imports => [NotificationsModule()];
+
   @override
   void exportedBinds(Injector i) {
     i.addLazySingleton<LocalStorage>(SpLocalStorage.new);
