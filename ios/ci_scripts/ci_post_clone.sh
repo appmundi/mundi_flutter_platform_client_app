@@ -22,6 +22,8 @@ flutter pub get
 HOMEBREW_NO_AUTO_UPDATE=1 brew install cocoapods
 
 # Entra na pasta ios e instala os Pods nativos
-cd ios && pod install --repo-update
+cd ios
+rm -f Podfile.lock
+pod install --repo-update
 
 exit 0
