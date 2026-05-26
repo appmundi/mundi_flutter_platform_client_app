@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/deep_link/deep_link_service.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/extension/size_screen_extension.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/text_styles.dart';
 import 'package:themed/themed.dart';
@@ -21,7 +22,8 @@ class _SplashPageState extends State<SplashPage> {
 
   void initialize() async {
     await Future.delayed(const Duration(seconds: 2));
-    Modular.to.navigate('/home/',arguments: {'currentPage': 0});
+    Modular.to.navigate('/home/', arguments: {'currentPage': 0});
+    DeepLinkService().notifyAppReady();
   }
 
   @override
