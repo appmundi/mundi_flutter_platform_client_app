@@ -54,20 +54,24 @@ class DeepLinkService {
     }
   }
 
-  void _handleLink(Uri uri) {
+  Future<void> _handleLink(Uri uri) async {
     final id = int.tryParse(uri.queryParameters['id'] ?? '');
     if (id == null) return;
 
-    final isMundiScheme = uri.scheme == 'mundi' && uri.host == 'entrepreneur';
-    final isHttpsLink = uri.scheme == 'https' &&
+    final isMundiScheme =
+        uri.scheme == 'mundi' &&
+        (uri.host == 'entrepreneur' || uri.path == '/entrepreneur');
+
+    final isHttpsLink =
+        uri.scheme == 'https' &&
         uri.host == 'mundiapp.com.br' &&
         uri.path.startsWith('/entrepreneur');
 
     if (!isMundiScheme && !isHttpsLink) return;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      Modular.to.pushNamed('/home/entrepreneur/', arguments: id);
-    });
+    await Future.delayed(const Duration(milliseconds: 500));
+
+    Modular.to.pushNamed('/home/entrepreneur/', arguments: id);
   }
 
   void dispose() {
