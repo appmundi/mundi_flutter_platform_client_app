@@ -1,10 +1,10 @@
 // This is a generated file; do not edit or check into version control.
-FLUTTER_ROOT=/Users/joe/Development/flutter
-FLUTTER_APPLICATION_PATH=/Users/joe/Development/mundi/mundi_flutter_platform_client_app
+FLUTTER_ROOT=/Users/asafebymarques/fvm/versions/stable
+FLUTTER_APPLICATION_PATH=/Users/asafebymarques/mundi-projects/mundi_flutter_platform_client_app
 COCOAPODS_PARALLEL_CODE_SIGN=true
 FLUTTER_BUILD_DIR=build
-FLUTTER_BUILD_NAME=1.0.0
-FLUTTER_BUILD_NUMBER=4
+FLUTTER_BUILD_NAME=1.1.0
+FLUTTER_BUILD_NUMBER=19
 DART_OBFUSCATION=false
 TRACK_WIDGET_CREATION=true
 TREE_SHAKE_ICONS=false
