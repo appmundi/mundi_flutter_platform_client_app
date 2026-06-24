@@ -1,7 +1,6 @@
 import 'dart:developer';
 
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/rest/rest_client_exception.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/storage/local_storage.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/schedule.dart';
@@ -18,16 +17,6 @@ class ScheduleRepository implements IScheduleRepository {
   ScheduleRepository({
     required RestClient rest,
   }) : _rest = rest;
-
-  Future<void> _getTokens(String tk) async {
-    try {
-      Map<String, dynamic> decodedToken = JwtDecoder.decode(tk);
-      print("Decodo isso > ${decodedToken['id']}");
-      await localStorage.write("entrepreneurId", decodedToken['id']);
-    } catch (e) {
-      print('Failed to decode token: $e');
-    }
-  }
 
   @override
   Future<List<Schedule>?> schedules() async {
@@ -56,20 +45,24 @@ class ScheduleRepository implements IScheduleRepository {
 
   @override
   Future<void> cancelSchedule(int scheduleId) async {
-    try {
-      final tk = await localStorage.read("accessToken");
-      _getTokens(tk);
-      print("Token > ${tk}");
-      var headers = {
-        'Content-type': 'application/json',
-        'Authorization': "Bearer $tk",
-      };
+    final tk = await localStorage.read("accessToken");
+    final headers = {
+      'Content-type': 'application/json',
+      'Authorization': "Bearer $tk",
+    };
 
-      final response =
-          await _rest.post('/scheduling/$scheduleId/cancel', headers: headers);
+    final response = await _rest.post(
+      '/scheduling/$scheduleId/cancel',
+      data: {'cancellerType': 'user'},
+      headers: headers,
+    );
 
-    } catch (e) {
-      print("Error ${e.toString()}");
+    // Surface backend failures instead of silently succeeding — the cubit
+    // depends on this to know whether the appointment was really cancelled.
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      throw ConnectionException(
+        errorMessage: 'Falha ao cancelar o agendamento',
+      );
     }
   }
 

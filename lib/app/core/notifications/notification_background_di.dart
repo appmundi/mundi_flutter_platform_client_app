@@ -2,6 +2,7 @@ import 'package:get_it/get_it.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/notifications/use_cases/handle_notification_tap_use_case.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/notifications/use_cases/register_fcm_token_use_case.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/notifications/use_cases/render_cancellation_use_case.dart';
+import 'package:mundi_flutter_platform_client_app/app/modules/notifications/use_cases/render_daily_agenda_use_case.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/notifications/use_cases/render_service_step_use_case.dart';
 
 import 'notification_service.dart';
@@ -27,6 +28,10 @@ class NotificationBackgroundDI {
 
     _gi.registerLazySingleton<RenderCancellationUseCase>(
       () => RenderCancellationUseCase(_gi<NotificationService>()),
+    );
+
+    _gi.registerLazySingleton<RenderDailyAgendaUseCase>(
+      () => RenderDailyAgendaUseCase(_gi<NotificationService>()),
     );
 
     _gi.registerLazySingleton<HandleNotificationTapUseCase>(

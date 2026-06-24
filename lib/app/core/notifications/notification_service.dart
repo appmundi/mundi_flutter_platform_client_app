@@ -9,13 +9,26 @@ class NotificationService {
   NotificationService._();
   static final NotificationService instance = NotificationService._();
 
-  Future<void> initialize() async {
+  bool _coreInitialized = false;
+
+  /// Initializes only the core AwesomeNotifications plugin (channels + groups).
+  /// Idempotent and safe to call from a background isolate — required before
+  /// [createNotification] works inside the FCM silent data handler, since the
+  /// background isolate never runs `main()` and therefore never calls
+  /// [initialize].
+  Future<void> ensureCoreInitialized() async {
+    if (_coreInitialized) return;
     await AwesomeNotifications().initialize(
-      null,
+      'resource://drawable/ic_stat_notification',
       AppChannels.channels,
       channelGroups: AppChannels.groups,
       debug: kDebugMode,
     );
+    _coreInitialized = true;
+  }
+
+  Future<void> initialize() async {
+    await ensureCoreInitialized();
 
     await AwesomeNotificationsFcm().initialize(
       onFcmSilentDataHandle: NotificationController.silentDataHandle,

@@ -1,6 +1,7 @@
 abstract class NotificationType {
   static const String serviceStep = 'service_step';
   static const String cancellation = 'cancellation';
+  static const String dailyAgenda = 'daily_agenda';
   static const String marketing = 'marketing';
 }
 
@@ -16,6 +17,7 @@ abstract class NotificationKeys {
   static const String otherPartyName = 'other_party_name';
   static const String otherPartyRole = 'other_party_role';
   static const String appointmentDatetime = 'appointment_datetime';
+  static const String count = 'count';
   static const String route = 'route';
   static const String campaignId = 'campaign_id';
 }

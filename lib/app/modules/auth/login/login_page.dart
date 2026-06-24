@@ -11,6 +11,8 @@ import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/app_button
 import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/app_text_field.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/default_padding.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/mundi_app_bar.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/notifications/notification_service.dart';
+import 'package:mundi_flutter_platform_client_app/app/modules/notifications/use_cases/register_fcm_token_use_case.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/auth/login/cubit/login_cubit.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/auth/login/cubit/login_state.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/auth/login/widgets/gradient_divider.dart';
@@ -31,6 +33,14 @@ class _LoginPageState extends State<LoginPage> with Messages<LoginPage> {
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
 
+  /// After a successful login the access token exists, so we can register the
+  /// FCM token with the backend and ask for notification permission. Runs
+  /// fire-and-forget so it never blocks navigation.
+  void _registerPushAfterLogin() {
+    Modular.get<RegisterFcmTokenUseCase>().run();
+    NotificationService.instance.ensurePermission();
+  }
+
   @override
   Widget build(BuildContext context) {
     return BlocConsumer<LoginCubit, LoginState>(
@@ -38,6 +48,7 @@ class _LoginPageState extends State<LoginPage> with Messages<LoginPage> {
         state.status.matchAny(
           success: () {
             showSuccess("Login Efetuado com sucesso");
+            _registerPushAfterLogin();
             Modular.to.navigate('/home');
           },
           error: () {

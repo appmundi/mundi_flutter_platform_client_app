@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Mundi accent — used to tint notification small icon / FCM default color -->
+    <color name="notification_color">#9D50DD</color>
+</resources>
