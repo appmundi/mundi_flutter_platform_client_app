@@ -4,7 +4,6 @@ import 'package:mundi_flutter_platform_client_app/app/core/exception/connection_
 import 'package:mundi_flutter_platform_client_app/app/core/rest/rest_client.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/entrepreneur.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/entrepeneur/i_entrepreneur_repository.dart';
-import 'dart:convert';
 
 class EntrepreneurRepository implements IEntrepreneurRepository {
   final RestClient _rest;
@@ -21,6 +20,7 @@ class EntrepreneurRepository implements IEntrepreneurRepository {
       }, queryParameters: {
         'query': query,
       });
+      print('deu erro?');
       print(response.data);
       final entrepreneurs = (response.data as List)
           .map<Entrepreneur>((data){
@@ -42,7 +42,7 @@ class EntrepreneurRepository implements IEntrepreneurRepository {
         'Content-Type': 'application/json',
       });
       
-      final entrepreneur = Entrepreneur.fromMap(jsonDecode(response.data));
+      final entrepreneur = Entrepreneur.fromMap(response.data);
 
       return entrepreneur;
     } catch (e) {

@@ -7,9 +7,6 @@ import 'package:mundi_flutter_platform_client_app/app/core/helpers/environments.
 class ApplicationConfig {
   Future<void> configure() async {
     WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
     await Environments.load();
   }
 }

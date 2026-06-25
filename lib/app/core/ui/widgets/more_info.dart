@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/helpers/environments.dart';
@@ -225,6 +226,8 @@ void _fetchChallengesByStatus(int scheduleId) async {
 
 Future<void> cancelSchedule(int scheduleId) async {
   try {
+    print('tentando cancelar o agendamento');
+    print(scheduleId);
     final LocalStorage localStorage = Modular.get<LocalStorage>();
 
     final tk = await localStorage.read("accessToken");
@@ -235,12 +238,13 @@ Future<void> cancelSchedule(int scheduleId) async {
     };
 
     // URL completa
-    final url = 'https://api.mundiapp.com.br/scheduling/$scheduleId/cancel';
-
+    final url = '${dotenv.get("BASE_URL")}/scheduling/$scheduleId/cancel';
+    print(url);
     // Fazendo a requisição POST
     final response = await http.post(Uri.parse(url), headers: headers);
 
-    if (response.statusCode == 200) {
+
+    if (response.statusCode == 201) {
       print("Cancelamento realizado com sucesso");
       print(response.body);
     } else {

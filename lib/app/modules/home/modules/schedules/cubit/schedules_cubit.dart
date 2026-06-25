@@ -96,9 +96,12 @@ class ScheduleCubit extends Cubit<ScheduleState> {
 
       await scheduleRepository.cancelSchedule(scheduleId);
 
-      emit(state.copyWith(status: ScheduleStatus.success));
+      // Reload so the cancelled appointment actually disappears from the list
+      // (loadSchedule emits the refreshed success state).
+      await loadSchedule();
     } catch (e) {
       print(e);
+      emit(state.copyWith(status: ScheduleStatus.error));
     }
   }
 

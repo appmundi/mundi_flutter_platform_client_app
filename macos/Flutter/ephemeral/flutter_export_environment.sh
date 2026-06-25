@@ -1,7 +1,8 @@
 #!/bin/sh
 # This is a generated file; do not edit or check into version control.
-export "FLUTTER_ROOT=/Users/asafebymarques/fvm/versions/stable"
-export "FLUTTER_APPLICATION_PATH=/Users/asafebymarques/mundi-projects/mundi_flutter_platform_client_app"
+export "FLUTTER_ROOT=C:\flutter"
+export "FLUTTER_APPLICATION_PATH=C:\Users\linkm\Documents\Mundi\mundi_flutter_platform_client_app"
+export "FLUTTER_FRAMEWORK_SWIFT_PACKAGE_PATH=C:\Users\linkm\Documents\Mundi\mundi_flutter_platform_client_app\macos\Flutter\ephemeral\Packages\.packages\FlutterFramework"
 export "COCOAPODS_PARALLEL_CODE_SIGN=true"
 export "FLUTTER_BUILD_DIR=build"
 export "FLUTTER_BUILD_NAME=1.1.0"

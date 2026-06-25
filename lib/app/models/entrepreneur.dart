@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:typed_data';
 
 import 'package:mundi_flutter_platform_client_app/app/core/ui/extension/string_extension.dart';
@@ -145,10 +146,28 @@ class Entrepreneur {
       state: map['state'] ?? '',
       phone: map['phone'] ?? '',
       email: map['email'] ?? '',
-      operation: List<Operation>.from(
-        json.decode(map['operation'])?.map((x) => Operation.fromMap(x)) ??
-            const [],
-      ),
+      operation: (() {
+        final operationData = map['operation'];
+
+        if (operationData == null) {
+          return <Operation>[];
+        }
+
+        if (operationData is String) {
+          return List<Operation>.from(
+            (json.decode(operationData) as List)
+                .map((x) => Operation.fromMap(x)),
+          );
+        }
+
+        if (operationData is List) {
+          return List<Operation>.from(
+            operationData.map((x) => Operation.fromMap(x)),
+          );
+        }
+
+        return <Operation>[];
+      })(),
       works: List<Work>.from(
         map['works']?.map((x) => Work.fromMap(x)) ?? const [],
       ),
@@ -204,7 +223,7 @@ class Operation {
     this.closingTime = "18:00",
   });
 
-  factory Operation.fromMap(Map<String, dynamic> data) {
+  factory Operation.fromMap(dynamic data) {
     return Operation(
       day: data['day'],
       closingTime: data['closingTime'],
