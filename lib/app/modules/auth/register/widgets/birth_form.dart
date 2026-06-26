@@ -27,7 +27,6 @@ class _BirthFormState extends State<_BirthForm> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       body: DefaultPadding(
         bgImagePath: 'assets/images/ellipses/register/registerEllipses5.png',
         child: Column(
@@ -90,7 +89,7 @@ class _BirthFormState extends State<_BirthForm> {
                                 years.indexOf(year) == selectedIndex ? 18 : 14,
                             color: years.indexOf(year) == selectedIndex
                                 ? context.colors.decorationPrimary
-                                : Colors.black.withOpacity(.25),
+                                : Colors.black.withValues(alpha: .25),
                           ),
                         ),
                       ),

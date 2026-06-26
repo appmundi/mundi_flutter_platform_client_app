@@ -173,7 +173,7 @@ class CommentField extends StatelessWidget {
           contentPadding: const EdgeInsets.all(16),
           hintStyle: context.textStyles.textLight.copyWith(
             fontSize: 10,
-            color: Colors.black.withOpacity(.4),
+            color: Colors.black.withValues(alpha: .4),
           ),
         ),
       ),

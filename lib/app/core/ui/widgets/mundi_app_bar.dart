@@ -31,7 +31,7 @@ class MundiAppBar extends StatelessWidget {
             height: 40,
             child: ElevatedButton(
               style: ElevatedButton.styleFrom(
-                shadowColor: Colors.grey.withOpacity(.2),
+                shadowColor: Colors.grey.withValues(alpha: .2),
                 backgroundColor: buttonColor,
                 padding: EdgeInsets.zero,
                 shape: RoundedRectangleBorder(

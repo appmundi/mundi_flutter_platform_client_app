@@ -24,7 +24,7 @@ class _OptionSwitchState extends State<OptionSwitch> {
       ),
       decoration: BoxDecoration(
         border: Border.all(
-          color: Colors.black.withOpacity(.7),
+          color: Colors.black.withValues(alpha: .7),
           width: .2,
         ),
         borderRadius: BorderRadius.circular(20),

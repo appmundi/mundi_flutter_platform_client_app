@@ -469,6 +469,8 @@ class _SchedulesPageState extends State<SchedulesPage> {
                                                 .entrepreneurPhone,
                                             scheduleId:
                                             sortedSchedules[index].id,
+                                            optionwork: sortedSchedules[index].optionwork,
+                                            entrepreneurAddress: sortedSchedules[index].entrepreneurAddress,
                                           ),
                                         );
                                       },

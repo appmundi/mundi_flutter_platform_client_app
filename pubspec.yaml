@@ -72,9 +72,10 @@ dependencies:
   timezone: ^0.10.1
   app_links: ^6.3.4
   share_plus: ^12.0.1
-  awesome_notifications: ^0.10.1
-  awesome_notifications_fcm: ^0.10.1
+  awesome_notifications: ^0.11.0
+  awesome_notifications_fcm: ^0.11.0
   get_it: ^7.7.0
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:

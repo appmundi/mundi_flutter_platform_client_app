@@ -76,7 +76,7 @@ class _GradientTextFieldState extends State<GradientTextField> {
           contentPadding: widget.contentPadding,
           hintText: widget.hintText,
           hintStyle: context.textStyles.textRegular.copyWith(
-            color: Colors.white.withOpacity(.32),
+            color: Colors.white.withValues(alpha: .32),
           ),
           border: InputBorder.none,
           focusedBorder: InputBorder.none,

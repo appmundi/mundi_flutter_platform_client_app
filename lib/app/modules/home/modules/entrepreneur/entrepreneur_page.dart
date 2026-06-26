@@ -270,7 +270,7 @@ class _EntrepreneurPageState extends State<EntrepreneurPage>
                             ),
                             indicatorSize: TabBarIndicatorSize.tab,
                             indicatorPadding: const EdgeInsets.only(right: 8),
-                            overlayColor: MaterialStateProperty.all(Colors.transparent),
+                            overlayColor: WidgetStateProperty.all(Colors.transparent),
                             indicator: BoxDecoration(
                               border: Border.all(
                                 color: context.colors.decorationPrimary,

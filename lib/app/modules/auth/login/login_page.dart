@@ -59,7 +59,6 @@ class _LoginPageState extends State<LoginPage> with Messages<LoginPage> {
       },
       builder: (context, state) {
         return Scaffold(
-          resizeToAvoidBottomInset: false,
           backgroundColor: const Color.fromRGBO(6, 14, 39, 1),
           body: DefaultPadding(
             bgImagePath: 'assets/images/ellipses/login/loginEllipses.png',
@@ -100,7 +99,7 @@ class _LoginPageState extends State<LoginPage> with Messages<LoginPage> {
                             "Vamos trabalhar?",
                             style: context.textStyles.textRegular.copyWith(
                               fontSize: 14.33,
-                              color: const Color.fromRGBO(164, 164, 164, 1),
+                              color: context.colors.mutedText,
                             ),
                           ),
                           const SizedBox(
@@ -130,7 +129,7 @@ class _LoginPageState extends State<LoginPage> with Messages<LoginPage> {
                           InkWell(
                             child: Text("Esqueceu a senha?", style: context.textStyles.titleBold.copyWith(
                               fontSize: 14.33,
-                              color: const Color.fromRGBO(164, 164, 164, 1),
+                              color: context.colors.mutedText,
                               fontWeight: FontWeight.w300,
                             ),),
                             onTap: (){

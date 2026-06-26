@@ -105,7 +105,7 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         side: BorderSide(
-          color: Colors.red.withOpacity(0.6),
+          color: Colors.red.withValues(alpha: 0.6),
           width: .5,
         ),
       ),

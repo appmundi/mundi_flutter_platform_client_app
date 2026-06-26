@@ -89,7 +89,6 @@ class _RegisterPageState extends State<RegisterPage>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromRGBO(6, 14, 39, 1),
       body: BlocConsumer<RegisterCubit, RegisterState>(
         listener: (context, state) {

@@ -6,11 +6,12 @@ class OpenHoursTile extends StatelessWidget {
   final String day;
   final String? startAt;
   final String? endAt;
+
   const OpenHoursTile({
     super.key,
     required this.day,
-    required this.endAt,
     required this.startAt,
+    required this.endAt,
   });
 
   const OpenHoursTile.closed({
@@ -19,38 +20,64 @@ class OpenHoursTile extends StatelessWidget {
   })  : startAt = null,
         endAt = null;
 
+  bool get _isOpen => startAt != null;
+
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          day,
-          style: context.textStyles.textRegular.copyWith(
-            color: const Color.fromRGBO(164, 164, 164, 1),
-            fontSize: 10,
-          ),
-        ),
-        Container(
-          width: 100,
-          height: 15,
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: startAt == null ? Colors.red : context.colors.secondary,
-              width: 1,
-            ),
-            borderRadius: BorderRadius.circular(4),
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            startAt != null ? '${startAt}h às ${endAt}h' : "Fechado",
-            style: context.textStyles.titleBold.copyWith(
-              fontSize: 8,
-              color: startAt == null ? Colors.red : context.colors.secondary,
+    final barColor = _isOpen ? context.colors.secondary : Colors.red;
+    return IntrinsicHeight(
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Container(
+            width: 4,
+            decoration: BoxDecoration(
+              color: barColor,
+              borderRadius: BorderRadius.circular(2),
             ),
           ),
-        ),
-      ],
+          const SizedBox(width: 10),
+          Expanded(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  day,
+                  style: context.textStyles.textRegular.copyWith(
+                    color: context.colors.textPrimary,
+                    fontSize: 13,
+                  ),
+                ),
+                _isOpen
+                    ? Text(
+                        '${startAt}h–${endAt}h',
+                        style: context.textStyles.textRegular.copyWith(
+                          fontSize: 12,
+                          color: context.colors.secondary,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      )
+                    : Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: context.colors.cardBackground,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          'Fechado',
+                          style: context.textStyles.textRegular.copyWith(
+                            fontSize: 12,
+                            color: context.colors.mutedText,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

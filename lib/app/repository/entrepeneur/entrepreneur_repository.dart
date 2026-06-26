@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:mundi_flutter_platform_client_app/app/core/exception/connection_exception.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/rest/rest_client.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/entrepreneur.dart';
@@ -13,24 +11,19 @@ class EntrepreneurRepository implements IEntrepreneurRepository {
   }) : _rest = rest;
 
   @override
-  Future<List<Entrepreneur>?> searchAll([String? query]) async {
+  Future<List<Entrepreneur>?> searchAll([String? query, String? section]) async {
     try {
-      final response = await _rest.get("/entrepreneur/searchAll",headers: {
+      final response = await _rest.get('/entrepreneur/searchAll', headers: {
         'Content-Type': 'application/json',
       }, queryParameters: {
-        'query': query,
+        if (query != null && query.isNotEmpty) 'query': query,
+        if (section != null) 'section': section,
       });
-      print('deu erro?');
-      print(response.data);
       final entrepreneurs = (response.data as List)
-          .map<Entrepreneur>((data){
-       return Entrepreneur.fromMap(data);
-      })
+          .map<Entrepreneur>((data) => Entrepreneur.fromMap(data))
           .toList();
-
       return entrepreneurs;
     } catch (e) {
-      print(e);
       throw ConnectionException();
     }
   }
@@ -38,15 +31,11 @@ class EntrepreneurRepository implements IEntrepreneurRepository {
   @override
   Future<Entrepreneur?> search(int id) async {
     try {
-      final response = await _rest.get("/entrepreneur/search/$id",headers: {
+      final response = await _rest.get('/entrepreneur/search/$id', headers: {
         'Content-Type': 'application/json',
       });
-      
-      final entrepreneur = Entrepreneur.fromMap(response.data);
-
-      return entrepreneur;
+      return Entrepreneur.fromMap(response.data);
     } catch (e) {
-      print(e);
       throw ConnectionException();
     }
   }

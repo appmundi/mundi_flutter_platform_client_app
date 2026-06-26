@@ -2,6 +2,8 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/deep_link/deep_link_service.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/session/session_service.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/storage/local_storage.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/extension/size_screen_extension.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/text_styles.dart';
 import 'package:themed/themed.dart';
@@ -21,8 +23,15 @@ class _SplashPageState extends State<SplashPage> {
   }
 
   void initialize() async {
-    await Future.delayed(const Duration(seconds: 2));
-    Modular.to.navigate('/home/', arguments: {'currentPage': 0});
+    final session = SessionService(Modular.get<LocalStorage>());
+    await session.bootstrap();
+    final loggedIn = await session.isLoggedIn();
+    if (!mounted) return;
+    if (loggedIn) {
+      Modular.to.navigate('/home/', arguments: {'currentPage': 0});
+    } else {
+      Modular.to.navigate('/auth/');
+    }
     DeepLinkService().notifyAppReady();
   }
 
@@ -60,9 +69,9 @@ class _SplashPageState extends State<SplashPage> {
                   stops: const [.063, .6, .4, .7, .9],
                   colors: [
                     const Color.fromARGB(255, 4, 10, 31),
-                    const Color.fromARGB(255, 4, 10, 31).withOpacity(.5),
-                    const Color.fromARGB(255, 4, 10, 31).withOpacity(.5),
-                    const Color.fromARGB(255, 4, 10, 31).withOpacity(.86),
+                    const Color.fromARGB(255, 4, 10, 31).withValues(alpha: .5),
+                    const Color.fromARGB(255, 4, 10, 31).withValues(alpha: .5),
+                    const Color.fromARGB(255, 4, 10, 31).withValues(alpha: .86),
                     const Color.fromARGB(255, 4, 10, 31)
                   ],
                 ),

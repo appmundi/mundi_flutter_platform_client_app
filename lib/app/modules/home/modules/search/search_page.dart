@@ -204,7 +204,7 @@ class _SearchPageState extends State<SearchPage> {
                                 vertical: 6,
                               ),
                               decoration: BoxDecoration(
-                                color: context.colors.decorationPrimary.withOpacity(0.2),
+                                color: context.colors.decorationPrimary.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(8),
                                 border: Border.all(
                                   color: context.colors.decorationPrimary,

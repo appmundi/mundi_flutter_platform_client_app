@@ -20,6 +20,9 @@ class HomeState extends Equatable {
   final List<Chat>? chats;
   final List<Entrepreneur>? filteredEntrepreneurs;
   final List<Entrepreneur>? filteredCategoryEntrepreneurs;
+  final List<Entrepreneur>? specialOffers;
+  final List<Entrepreneur>? recommended;
+  final List<Entrepreneur>? availableToday;
 
   const HomeState(
       {required this.status,
@@ -27,7 +30,10 @@ class HomeState extends Equatable {
       this.errorMessage,
       this.chats,
       this.filteredEntrepreneurs,
-      this.filteredCategoryEntrepreneurs});
+      this.filteredCategoryEntrepreneurs,
+      this.specialOffers,
+      this.recommended,
+      this.availableToday});
 
   const HomeState.initial()
       : status = HomeStateStatus.initial,
@@ -35,7 +41,10 @@ class HomeState extends Equatable {
         chats = null,
         errorMessage = null,
         filteredEntrepreneurs = null,
-        filteredCategoryEntrepreneurs = null;
+        filteredCategoryEntrepreneurs = null,
+        specialOffers = null,
+        recommended = null,
+        availableToday = null;
 
   @override
   List<Object?> get props => [
@@ -44,7 +53,10 @@ class HomeState extends Equatable {
         errorMessage,
         chats,
         filteredEntrepreneurs,
-        filteredCategoryEntrepreneurs
+        filteredCategoryEntrepreneurs,
+        specialOffers,
+        recommended,
+        availableToday,
       ];
 
   HomeState copyWith(
@@ -54,7 +66,10 @@ class HomeState extends Equatable {
       String? errorMessage,
       List<Entrepreneur>? entrepreneurs,
       List<Entrepreneur>? filteredEntrepreneurs,
-      List<Entrepreneur>? filteredCategoryEntrepreneurs}) {
+      List<Entrepreneur>? filteredCategoryEntrepreneurs,
+      List<Entrepreneur>? specialOffers,
+      List<Entrepreneur>? recommended,
+      List<Entrepreneur>? availableToday}) {
     return HomeState(
         status: status ?? this.status,
         entrepreneurs: entrepreneurs ?? this.entrepreneurs,
@@ -63,6 +78,9 @@ class HomeState extends Equatable {
         filteredEntrepreneurs:
             filteredEntrepreneurs ?? this.filteredEntrepreneurs,
         filteredCategoryEntrepreneurs: filteredCategoryEntrepreneurs ??
-            this.filteredCategoryEntrepreneurs);
+            this.filteredCategoryEntrepreneurs,
+        specialOffers: specialOffers ?? this.specialOffers,
+        recommended: recommended ?? this.recommended,
+        availableToday: availableToday ?? this.availableToday);
   }
 }

@@ -187,7 +187,7 @@ class _ResultTileState extends State<ResultTile> {
                 textAlign: TextAlign.left,
                 style: context.textStyles.textRegular.copyWith(
                   fontSize: 10,
-                  color: const Color.fromRGBO(164, 164, 164, 1),
+                  color: context.colors.mutedText,
                   height: 1.35,
                 ),
               ),
