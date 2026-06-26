@@ -38,7 +38,7 @@ dependencies:
   http: ^1.2.1
   blurrycontainer: ^2.1.0
   themed: ^5.0.3
-  firebase_core: ^3.14.0
+  firebase_core: ^4.4.0
   flutter_screenutil: ^5.9.0
   flutter_map: ^6.1.0
   latlong2: ^0.9.1
@@ -53,7 +53,7 @@ dependencies:
   validatorless: ^1.2.3
   equatable: ^2.0.5
   top_snackbar_flutter: ^3.1.0
-  cloud_firestore: ^5.0.0
+  cloud_firestore: ^6.6.0
   jwt_decoder: ^2.0.1
   geocoding: ^3.0.0
   search_cep: ^4.0.2
@@ -75,7 +75,7 @@ dependencies:
   awesome_notifications: ^0.11.0
   awesome_notifications_fcm: ^0.11.0
   get_it: ^7.7.0
-  intl: ^0.19.0
+  intl: ^0.20.0
 
 dev_dependencies:
   flutter_test:

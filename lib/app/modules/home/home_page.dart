@@ -71,7 +71,7 @@ class _HomePageState extends State<HomePage> {
                 _pageController.jumpToPage(0);
                 _currentPage = 0;
               });
-              Modular.to.pushNamed('/auth/options/');
+              Modular.to.pushNamed('/auth/options');
             }
           } else {
             setState(() {

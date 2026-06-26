@@ -24,13 +24,13 @@ class _ModalityTileState extends State<ModalityTile> {
     bool isLogged = await localStorage.contains("accessToken");
     if (isLogged) {
       Modular.to.pushNamed(
-        '/home/entrepreneur/reserve/',
+        '/home/entrepreneur/reserve',
         arguments: ReservePageArguments(
                         entrepreneurId: widget.entrepreneurId, modality: widget.modality,entrepreneur: widget.entrepreneur),
       );
     } else {
       Modular.to.pushNamed(
-        '/auth/options/',
+        '/auth/options',
       );
     }
   }

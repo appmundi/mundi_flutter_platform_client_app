@@ -61,7 +61,7 @@ class _HorizontalEntrepreneursListState extends State<HorizontalEntrepreneursLis
               return InkWell(
                 onTap: () {
                   Modular.to.pushNamed(
-                    '/home/entrepreneur/',
+                    '/home/entrepreneur',
                     arguments: entrepreneur.id,
                   );
                 },

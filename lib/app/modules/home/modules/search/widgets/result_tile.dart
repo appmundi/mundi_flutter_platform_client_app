@@ -226,7 +226,7 @@ class _ResultTileState extends State<ResultTile> {
             ),
             GestureDetector(
               onTap: () => Modular.to.pushNamed(
-                '/home/entrepreneur/',
+                '/home/entrepreneur',
                 arguments: widget.entrepreneur!.id,
               ),
               child: Container(

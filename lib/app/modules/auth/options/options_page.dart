@@ -117,7 +117,7 @@ class _OptionsPageState extends State<OptionsPage> {
                 children: [
                   AppButton(
                     onPressed: () {
-                      Modular.to.pushNamed('/auth/register/');
+                      Modular.to.pushNamed('/auth/register');
                     },
                     text: 'Registre-se aqui',
                   ),
@@ -126,7 +126,7 @@ class _OptionsPageState extends State<OptionsPage> {
                   ),
                   AppButtonOutline(
                     onPressed: () {
-                      Modular.to.pushNamed('/auth/login/');
+                      Modular.to.pushNamed('/auth/login');
                     },
                     text: 'Login',
                   ),

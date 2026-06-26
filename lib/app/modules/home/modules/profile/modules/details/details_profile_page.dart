@@ -272,7 +272,7 @@ class _DetailsPageState extends State<DetailsProfilePage>
 
           if(state.status == DetailsProfileStatus.updated) {
             showSuccess("Alterado com Sucesso !");
-            Modular.to.navigate('/home/');
+            Modular.to.navigate('/home');
           }
         },
         builder: (context, state) {

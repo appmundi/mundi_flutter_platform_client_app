@@ -171,7 +171,7 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       await Modular.get<IAuthRepository>().deleteAccount(userId);
       await localStorage.clear();
-      Modular.to.navigate('/splash/');
+      Modular.to.navigate('/splash');
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

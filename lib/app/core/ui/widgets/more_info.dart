@@ -134,7 +134,7 @@ class _ModalContent extends StatelessWidget {
             text: 'Ver Loja',
             onPressed: () {
               Modular.to.pushNamed(
-                '/home/entrepreneur/',
+                '/home/entrepreneur',
                 arguments: reservation.entrepreneurId,
               );
             },

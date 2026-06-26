@@ -347,7 +347,7 @@ class _ReservePageState extends State<ReservePage> with Messages<ReservePage> {
               _dateController.selectedDate!.fillHourAndMinute(hour, minute),
             );
             Modular.to.popUntil(
-              ModalRoute.withName('/home/'),
+              ModalRoute.withName('/home'),
             ); // Atualiza a lista de horários disponíveis
             setState(() {}); // Atualiza a interface
           },

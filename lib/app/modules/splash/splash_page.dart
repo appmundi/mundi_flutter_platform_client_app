@@ -28,9 +28,9 @@ class _SplashPageState extends State<SplashPage> {
     final loggedIn = await session.isLoggedIn();
     if (!mounted) return;
     if (loggedIn) {
-      Modular.to.navigate('/home/', arguments: {'currentPage': 0});
+      Modular.to.navigate('/home', arguments: {'currentPage': 0});
     } else {
-      Modular.to.navigate('/auth/');
+      Modular.to.navigate('/home');
     }
     DeepLinkService().notifyAppReady();
   }
