@@ -1,6 +1,5 @@
 part of '../recovery_password_page.dart';
 
-
 class _CardForm extends StatefulWidget {
   final String label;
   final String bgImagePath;
@@ -38,25 +37,29 @@ class _CardFormState extends State<_CardForm> {
         key: _formKey,
         child: Column(
           children: [
-            MundiAppBar(
-              showButton: true,
-              onButtonPress: widget.onReturn,
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            CardRegister(
-              label: widget.label,
-              onSubmit: () {
-                if (_formKey.currentState!.validate()) {
-                  widget.onSubmit();
-                }
-              },
-              hintText: widget.hintText,
-              obscureText: widget.obscureText,
-              controller: widget.controller,
-              inputFormatters: widget.inputFormatters,
-              validator: widget.validator,
+            MundiAppBar(showButton: true, onButtonPress: widget.onReturn),
+            Expanded(
+              child: SingleChildScrollView(
+                keyboardDismissBehavior:
+                    ScrollViewKeyboardDismissBehavior.onDrag,
+                padding: EdgeInsets.only(
+                  top: 30,
+                  bottom: MediaQuery.viewInsetsOf(context).bottom + 24,
+                ),
+                child: CardRegister(
+                  label: widget.label,
+                  onSubmit: () {
+                    if (_formKey.currentState!.validate()) {
+                      widget.onSubmit();
+                    }
+                  },
+                  hintText: widget.hintText,
+                  obscureText: widget.obscureText,
+                  controller: widget.controller,
+                  inputFormatters: widget.inputFormatters,
+                  validator: widget.validator,
+                ),
+              ),
             ),
           ],
         ),

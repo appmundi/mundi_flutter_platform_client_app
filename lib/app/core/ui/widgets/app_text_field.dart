@@ -40,9 +40,7 @@ class _AppTextFieldState extends State<AppTextField> {
             fontWeight: FontWeight.w300,
           ),
         ),
-        const SizedBox(
-          height: 10,
-        ),
+        const SizedBox(height: 10),
         BlurryContainer(
           blur: 20,
           padding: EdgeInsets.zero,
@@ -56,23 +54,19 @@ class _AppTextFieldState extends State<AppTextField> {
               gradient: LinearGradient(
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
-                stops: const [
-                  0.1,
-                  .9,
-                ],
+                stops: const [0.1, .9],
                 colors: [
                   Colors.transparent,
                   Colors.white.withValues(alpha: .2),
                 ],
               ),
-              border: Border.all(
-                color: Colors.white,
-                width: .5,
-              ),
+              border: Border.all(color: Colors.white, width: .5),
             ),
             child: TextFormField(
               validator: widget.validator,
-              scrollPadding: EdgeInsets.zero,
+              scrollPadding: EdgeInsets.only(
+                bottom: MediaQuery.viewInsetsOf(context).bottom + 24,
+              ),
               textAlignVertical: TextAlignVertical.center,
               controller: widget.controller,
               obscureText: widget.obscureText,
@@ -86,7 +80,7 @@ class _AppTextFieldState extends State<AppTextField> {
                   color: Colors.white.withValues(alpha: .32),
                 ),
                 focusedBorder: InputBorder.none,
-              )
+              ),
             ),
           ),
         ),
