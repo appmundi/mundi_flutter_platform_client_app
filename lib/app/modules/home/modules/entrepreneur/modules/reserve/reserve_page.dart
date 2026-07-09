@@ -102,7 +102,9 @@ class _ReservePageState extends State<ReservePage> with Messages<ReservePage> {
   void _removeModality(int index) {
     setState(() {
       modalities.removeAt(index);
+      selectedTime = '';
     });
+    _loadAvailableTimes();
   }
 
   Widget _buildAdditionalModalitiesContainer() {

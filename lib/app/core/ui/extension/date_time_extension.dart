@@ -11,7 +11,9 @@ extension DateTimeExtension on DateTime {
 }
 
 extension ApiDateStringExtension on String {
-  DateTime get apiDateMinusThreeHours {
-    return DateTime.parse(this).subtract(const Duration(hours: 3));
+  /// Interpreta a string vinda da API como UTC e converte para o fuso local.
+  DateTime get apiDateToLocal {
+    final dt = DateTime.parse(this);
+    return dt.isUtc ? dt.toLocal() : dt;
   }
 }

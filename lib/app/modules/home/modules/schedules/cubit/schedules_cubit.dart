@@ -25,8 +25,8 @@ class ScheduleCubit extends Cubit<ScheduleState> {
         final originalList = state.schedules ?? <Schedule>[];
 
         originalList.sort(
-          (a, b) => a.scheduledDate.apiDateMinusThreeHours.compareTo(
-            b.scheduledDate.apiDateMinusThreeHours,
+          (a, b) => a.scheduledDate.apiDateToLocal.compareTo(
+            b.scheduledDate.apiDateToLocal,
           ),
         );
 
@@ -48,8 +48,8 @@ class ScheduleCubit extends Cubit<ScheduleState> {
       }).toList();
 
       newList.sort(
-        (a, b) => a.scheduledDate.apiDateMinusThreeHours.compareTo(
-          b.scheduledDate.apiDateMinusThreeHours,
+        (a, b) => a.scheduledDate.apiDateToLocal.compareTo(
+          b.scheduledDate.apiDateToLocal,
         ),
       );
 
@@ -81,7 +81,8 @@ class ScheduleCubit extends Cubit<ScheduleState> {
           schedules: schedules,
           status: ScheduleStatus.success));
       return schedules;
-    } on Error {
+    } catch (e) {
+      print(e);
       emit(state.copyWith(status: ScheduleStatus.error, scheduleFiltered: null,
         schedules: null,));
     }
