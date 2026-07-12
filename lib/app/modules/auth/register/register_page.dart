@@ -19,6 +19,7 @@ import 'package:mundi_flutter_platform_client_app/app/core/ui/widgets/mundi_app_
 import 'package:mundi_flutter_platform_client_app/app/models/entrepreneur.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/user.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/auth/register/cubit/register_cubit.dart';
+import 'package:mundi_flutter_platform_client_app/app/repository/auth/i_auth_repository.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/category/i_category_repository.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/auth/register/cubit/register_state.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/auth/register/widgets/card_register.dart';
@@ -46,10 +47,43 @@ class _RegisterPageState extends State<RegisterPage>
   final passwordCtrl = TextEditingController();
   final phoneCtrl = TextEditingController();
   final _stepController = PageController(initialPage: 0);
-
-  
+  bool _checkingAvailability = false;
 
   Future<void> onSubmit() async {
+    final page = _stepController.page?.round() ?? 0;
+
+    if (page == 1) {
+      if (_checkingAvailability) return;
+      setState(() => _checkingAvailability = true);
+      try {
+        final inUse =
+            await Modular.get<IAuthRepository>().isDocInUse(cpfCtrl.text);
+        if (inUse) {
+          showError(
+              'Este CPF já está cadastrado. Faça login ou recupere sua senha.');
+          return;
+        }
+      } finally {
+        if (mounted) setState(() => _checkingAvailability = false);
+      }
+    }
+
+    if (page == 2) {
+      if (_checkingAvailability) return;
+      setState(() => _checkingAvailability = true);
+      try {
+        final inUse =
+            await Modular.get<IAuthRepository>().isEmailInUse(emailCtrl.text);
+        if (inUse) {
+          showError(
+              'Este e-mail já está cadastrado. Faça login ou recupere sua senha.');
+          return;
+        }
+      } finally {
+        if (mounted) setState(() => _checkingAvailability = false);
+      }
+    }
+
     if (_stepController.page != 8) {
       final viaCepSearchCep = ViaCepSearchCep();
       final infoCepJSON = await viaCepSearchCep.searchInfoByCep(cep: cepCtrl.text);

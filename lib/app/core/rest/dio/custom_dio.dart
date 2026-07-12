@@ -29,6 +29,21 @@ class CustomDio implements RestClient {
         },
       ),
     );
+
+    // ===== DEBUG TEMPORÁRIO — interceptor de log (remover antes de produção) =====
+    // Loga método+URL de cada request, o corpo de cada response e erros.
+    // requestBody/requestHeader ficam OFF pra não vazar senha/token no console.
+    _dio.interceptors.add(
+      LogInterceptor(
+        request: true,
+        requestHeader: false,
+        requestBody: false,
+        responseHeader: false,
+        responseBody: true,
+        error: true,
+      ),
+    );
+    // ===========================================================================
   }
 
   @override

@@ -13,4 +13,6 @@ abstract class IAuthRepository {
   Future<void> updateImage(int userId, File file);
   Future<void> deleteImage(int userId);
   Future<void> deleteAccount(int userId);
+  Future<bool> isEmailInUse(String email);
+  Future<bool> isDocInUse(String doc);
 }

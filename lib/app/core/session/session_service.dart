@@ -12,9 +12,15 @@ class SessionService {
     final tk = await token();
     if (tk == null || tk.isEmpty) return false;
     try {
-      return !JwtDecoder.isExpired(tk);
+      JwtDecoder.decode(tk);
     } catch (_) {
       return false;
+    }
+    try {
+      return !JwtDecoder.isExpired(tk);
+    } catch (_) {
+      // No exp claim means the token never expires
+      return true;
     }
   }
 

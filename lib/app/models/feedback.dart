@@ -19,13 +19,13 @@ class Feedback {
 
   factory Feedback.fromMap(Map<String, dynamic> map) {
     return Feedback(
-      id: map['id'],
-      entrepreneurId: map['entrepreneurId'],
-      userName: map['name'],
-      userId: map['userId'],
-      scheduleId: map['scheduleId'],
-      rating: map['rating'],
-      comment: map['comment'],
+      id: (map['id'] as num?)?.toInt(),
+      entrepreneurId: (map['entrepreneurId'] as num?)?.toInt(),
+      userName: map['name']?.toString() ?? '',
+      userId: (map['userId'] as num?)?.toInt(),
+      scheduleId: (map['scheduleId'] as num?)?.toInt(),
+      rating: (map['rating'] as num?)?.toDouble() ?? 0.0,
+      comment: map['comment']?.toString() ?? '',
     );
   }
 

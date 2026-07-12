@@ -85,9 +85,9 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(height: 10),
             SettingButton(
               label: 'Sair',
-              onPressed: () {
-                localStorage.clear();
-                Modular.to.pushNamed('/splash');
+              onPressed: () async {
+                await localStorage.clear();
+                Modular.to.navigate('/home');
               },
             ),
             const SizedBox(height: 20),

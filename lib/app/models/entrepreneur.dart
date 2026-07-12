@@ -177,7 +177,7 @@ class Entrepreneur {
                 map['avaliation']?.map((x) => Rating.fromMap(x)),
               )
               : null,
-      distance: double.parse(map['distance'] ?? "0.0"),
+      distance: double.tryParse(map['distance']?.toString() ?? '') ?? 0.0,
       latitude: (map['latitude'] as num?)?.toDouble() ?? 0.0,
       longitude: (map['longitude'] as num?)?.toDouble() ?? 0.0,
       profileImage: _decodeProfileImage(map['profileImage']),

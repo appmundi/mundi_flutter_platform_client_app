@@ -54,11 +54,11 @@ class User {
       doc: map['doc'] ?? '',
       phone: map['phone'] ?? '',
       address: map['address'] ?? '',
-      addressNumber: map['addressNumber'] ?? '',
-      cep: map['cep'],
-      city: map['city'],
-      state: map['state'],
-      imageUrl: map['imageUrl'],
+      addressNumber: map['addressNumber']?.toString() ?? '',
+      cep: map['cep'] ?? '',
+      city: map['city'] ?? '',
+      state: map['state'] ?? '',
+      imageUrl: map['imageUrl'] ?? '',
     );
   }
 
