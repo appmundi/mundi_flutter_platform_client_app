@@ -51,7 +51,6 @@ class _RecoveryPasswordPageState extends State<RecoveryPasswordPage> with Messag
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false,
       backgroundColor: const Color.fromRGBO(6, 14, 39, 1),
       body: BlocConsumer<RecoveryPasswordCubit, RecoveryPasswordState>(
         listener: (context, state) {

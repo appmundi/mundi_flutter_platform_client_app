@@ -1,4 +1,5 @@
 import 'package:bloc/bloc.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/exception/invalid_field_exception.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/entrepreneur/modules/reserve/cubit/reserve_state.dart';
 
 import '../../../../../../../repository/reserve/i_reserve_repository.dart';
@@ -29,10 +30,14 @@ class ReserveCubit extends Cubit<ReserveState> {
 
       emit(state.copyWith(status: ReserveStatus.success));
     } catch(e) {
+      String message = 'Erro ao realizar reserva';
+      if (e is InvalidFieldException && e.exception != null) {
+        message = e.exception!;
+      }
       emit(
         state.copyWith(
           status: ReserveStatus.error,
-          errorMessage: 'Erro ao realizar reserva',
+          errorMessage: message,
         ),
       );
     }

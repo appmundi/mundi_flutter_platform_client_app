@@ -85,9 +85,9 @@ class _ProfilePageState extends State<ProfilePage> {
             SizedBox(height: 10),
             SettingButton(
               label: 'Sair',
-              onPressed: () {
-                localStorage.clear();
-                Modular.to.pushNamed('/splash');
+              onPressed: () async {
+                await localStorage.clear();
+                Modular.to.navigate('/home');
               },
             ),
             const SizedBox(height: 20),
@@ -105,7 +105,7 @@ class _ProfilePageState extends State<ProfilePage> {
         backgroundColor: Colors.transparent,
         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
         side: BorderSide(
-          color: Colors.red.withOpacity(0.6),
+          color: Colors.red.withValues(alpha: 0.6),
           width: .5,
         ),
       ),
@@ -171,7 +171,7 @@ class _ProfilePageState extends State<ProfilePage> {
     try {
       await Modular.get<IAuthRepository>().deleteAccount(userId);
       await localStorage.clear();
-      Modular.to.navigate('/splash/');
+      Modular.to.navigate('/splash');
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -359,8 +359,8 @@ class _SchedulesPageState extends State<SchedulesPage> {
 
         List<Schedule> sortedSchedules = List.from(state.scheduleFiltered);
         sortedSchedules.sort((a, b) {
-          DateTime dateA = a.scheduledDate.apiDateMinusThreeHours;
-          DateTime dateB = b.scheduledDate.apiDateMinusThreeHours;
+          DateTime dateA = a.scheduledDate.apiDateToLocal;
+          DateTime dateB = b.scheduledDate.apiDateToLocal;
           return dateA.compareTo(dateB);
         });
 
@@ -423,7 +423,7 @@ class _SchedulesPageState extends State<SchedulesPage> {
                         itemCount: sortedSchedules.length,
                         itemBuilder: (context, index) {
                           final scheduledDate =
-                              sortedSchedules[index].scheduledDate.apiDateMinusThreeHours;
+                              sortedSchedules[index].scheduledDate.apiDateToLocal;
 
                           final currentDate = DateTime.now();
                           final currentDateWithoutTime = DateTime(
@@ -463,12 +463,14 @@ class _SchedulesPageState extends State<SchedulesPage> {
                                             sortedSchedules[index].modality,
                                             startAt: sortedSchedules[index]
                                                 .scheduledDate
-                                                .apiDateMinusThreeHours,
+                                                .apiDateToLocal,
                                             entrepreneurPhone:
                                             sortedSchedules[index]
                                                 .entrepreneurPhone,
                                             scheduleId:
                                             sortedSchedules[index].id,
+                                            optionwork: sortedSchedules[index].optionwork,
+                                            entrepreneurAddress: sortedSchedules[index].entrepreneurAddress,
                                           ),
                                         );
                                       },

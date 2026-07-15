@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/colors_app.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/text_styles.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/entrepreneur/modules/details/widgets/open_hours_tile.dart';
 
@@ -42,7 +43,7 @@ class DetailsPage extends StatelessWidget {
           Text(
             address,
             style: context.textStyles.textRegular.copyWith(
-              color: const Color.fromRGBO(164, 164, 164, 1),
+              color: context.colors.mutedText,
               fontSize: 10,
             ),
           ),
@@ -60,22 +61,20 @@ class DetailsPage extends StatelessWidget {
           const SizedBox(
             height: 5,
           ),
-          SizedBox(
-              height: MediaQuery.of(context).size.height * 0.23,
-              child: ListView.separated(
-                  itemBuilder: (context, index) => !operation[index].isActive
-                      ? OpenHoursTile.closed(
-                          day: operation[index].day,
-                        )
-                      : OpenHoursTile(
-                          startAt: operation[index].openinHours,
-                          endAt: operation[index].closingTime,
-                          day: operation[index].day,
-                        ),
-                  separatorBuilder: (context, index) => const SizedBox(
-                        height: 5,
+          Column(
+            children: [
+              for (int i = 0; i < operation.length; i++) ...[
+                !operation[i].isActive
+                    ? OpenHoursTile.closed(day: operation[i].day)
+                    : OpenHoursTile(
+                        startAt: operation[i].openinHours,
+                        endAt: operation[i].closingTime,
+                        day: operation[i].day,
                       ),
-                  itemCount: operation.length)),
+                if (i < operation.length - 1) const SizedBox(height: 8),
+              ],
+            ],
+          ),
           Text(
             "Contato",
             style: context.textStyles.textMedium.copyWith(
@@ -87,7 +86,7 @@ class DetailsPage extends StatelessWidget {
           Text(
             phone,
             style: context.textStyles.textRegular.copyWith(
-              color: const Color.fromRGBO(164, 164, 164, 1),
+              color: context.colors.mutedText,
               fontSize: 10,
             ),
           ),
@@ -97,7 +96,7 @@ class DetailsPage extends StatelessWidget {
           Text(
             email,
             style: context.textStyles.textRegular.copyWith(
-              color: const Color.fromRGBO(164, 164, 164, 1),
+              color: context.colors.mutedText,
               fontSize: 10,
             ),
           ),

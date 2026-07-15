@@ -7,7 +7,8 @@ class Reservation {
   final DateTime startAt;
   final String? entrepreneurPhone;
   final int scheduleId;
-
+  final bool optionwork;
+  final String? entrepreneurAddress;
 
   const Reservation({
     required this.userId,
@@ -15,6 +16,8 @@ class Reservation {
     required this.modality,
     required this.startAt,
     required this.entrepreneurPhone,
-    required this.scheduleId
+    required this.scheduleId,
+    this.optionwork = false,
+    this.entrepreneurAddress,
   });
 }

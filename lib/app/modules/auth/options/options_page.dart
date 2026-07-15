@@ -49,10 +49,10 @@ class _OptionsPageState extends State<OptionsPage> {
                   //tileMode: TileMode.clamp,
                   stops: const [.063, .6, .4, .7, .9],
                   colors: [
-                    const Color.fromARGB(255, 4, 10, 31).withOpacity(.1),
-                    const Color.fromARGB(255, 4, 10, 31).withOpacity(.1),
-                    const Color.fromARGB(255, 4, 10, 31).withOpacity(.14),
-                    const Color.fromARGB(255, 4, 10, 31).withOpacity(.94),
+                    const Color.fromARGB(255, 4, 10, 31).withValues(alpha: .1),
+                    const Color.fromARGB(255, 4, 10, 31).withValues(alpha: .1),
+                    const Color.fromARGB(255, 4, 10, 31).withValues(alpha: .14),
+                    const Color.fromARGB(255, 4, 10, 31).withValues(alpha: .94),
                     const Color.fromARGB(255, 4, 10, 31)
                   ],
                 ),
@@ -117,7 +117,7 @@ class _OptionsPageState extends State<OptionsPage> {
                 children: [
                   AppButton(
                     onPressed: () {
-                      Modular.to.pushNamed('/auth/register/');
+                      Modular.to.pushNamed('/auth/register');
                     },
                     text: 'Registre-se aqui',
                   ),
@@ -126,7 +126,7 @@ class _OptionsPageState extends State<OptionsPage> {
                   ),
                   AppButtonOutline(
                     onPressed: () {
-                      Modular.to.pushNamed('/auth/login/');
+                      Modular.to.pushNamed('/auth/login');
                     },
                     text: 'Login',
                   ),

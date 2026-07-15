@@ -261,4 +261,37 @@ class AuthRepository implements IAuthRepository {
       );
     }
   }
+
+  @override
+  Future<bool> isEmailInUse(String email) async {
+    try {
+      final response = await _rest.get(
+        "/user/check-availability",
+        queryParameters: {'email': email.trim()},
+      );
+      if (response.statusCode != 200) return false;
+      final data = response.data;
+      return data is Map && data['emailInUse'] == true;
+    } catch (e) {
+      print('Erro ao verificar e-mail: $e');
+      return false;
+    }
+  }
+
+  @override
+  Future<bool> isDocInUse(String doc) async {
+    try {
+      final digits = doc.replaceAll(RegExp(r'\D'), '');
+      final response = await _rest.get(
+        "/user/check-availability",
+        queryParameters: {'doc': digits},
+      );
+      if (response.statusCode != 200) return false;
+      final data = response.data;
+      return data is Map && data['docInUse'] == true;
+    } catch (e) {
+      print('Erro ao verificar CPF: $e');
+      return false;
+    }
+  }
 }

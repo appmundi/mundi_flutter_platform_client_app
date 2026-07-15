@@ -17,13 +17,13 @@ class HandleNotificationTapUseCase {
         case NotificationType.cancellation:
           _navigate(appointmentId != null
               ? '/home/schedules/?appointmentId=$appointmentId'
-              : '/home/schedules/');
+              : '/home/schedules');
           break;
         case NotificationType.marketing:
-          _navigate(route ?? '/home/');
+          _navigate(route ?? '/home');
           break;
         default:
-          _navigate('/home/');
+          _navigate('/home');
       }
     } catch (_) {
       // Navigation may fail on cold start — handled by getInitialNotificationAction
@@ -34,7 +34,7 @@ class HandleNotificationTapUseCase {
     try {
       Modular.to.pushNamed(route);
     } catch (_) {
-      Modular.to.pushNamed('/home/');
+      Modular.to.pushNamed('/home');
     }
   }
 }

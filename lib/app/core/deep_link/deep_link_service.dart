@@ -71,7 +71,7 @@ class DeepLinkService {
 
     await Future.delayed(const Duration(milliseconds: 500));
 
-    Modular.to.pushNamed('/home/entrepreneur/', arguments: id);
+    Modular.to.pushNamed('/home/entrepreneur', arguments: id);
   }
 
   void dispose() {

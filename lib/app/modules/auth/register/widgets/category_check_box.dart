@@ -66,7 +66,7 @@ class _CategoryCheckboxState extends State<CategoryCheckbox> {
               ),
               Checkbox(
                 fillColor:
-                    MaterialStateProperty.all(context.colors.decorationPrimary),
+                    WidgetStateProperty.all(context.colors.decorationPrimary),
                 side: BorderSide(
                   width: 1,
                   color: context.colors.decorationPrimary,

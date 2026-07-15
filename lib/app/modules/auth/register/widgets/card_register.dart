@@ -50,12 +50,17 @@ class _CardRegisterState extends State<CardRegister> {
           children: [
             Text(
               widget.label,
-              style: context.textStyles.titleBold
-                  .copyWith(color: Colors.white, fontSize: 25),
+              style: context.textStyles.titleBold.copyWith(
+                color: Colors.white,
+                fontSize: 25,
+              ),
             ),
             TextFormField(
               controller: widget.controller,
               validator: widget.validator,
+              scrollPadding: EdgeInsets.only(
+                bottom: MediaQuery.viewInsetsOf(context).bottom + 80,
+              ),
               inputFormatters: widget.inputFormatters,
               style: context.textStyles.textMedium.copyWith(
                 fontSize: 12,
@@ -78,9 +83,7 @@ class _CardRegisterState extends State<CardRegister> {
                     color: Color.fromRGBO(144, 240, 153, 1),
                   ),
                 ),
-                suffixIconConstraints: const BoxConstraints(
-                  maxHeight: 25,
-                ),
+                suffixIconConstraints: const BoxConstraints(maxHeight: 25),
                 suffixIcon: Visibility(
                   visible: widget.obscureText,
                   child: GestureDetector(
@@ -104,9 +107,7 @@ class _CardRegisterState extends State<CardRegister> {
                 ),
               ),
             ),
-            const SizedBox(
-              height: 10,
-            ),
+            const SizedBox(height: 10),
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [

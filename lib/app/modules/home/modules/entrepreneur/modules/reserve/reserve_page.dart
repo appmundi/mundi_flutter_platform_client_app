@@ -102,7 +102,9 @@ class _ReservePageState extends State<ReservePage> with Messages<ReservePage> {
   void _removeModality(int index) {
     setState(() {
       modalities.removeAt(index);
+      selectedTime = '';
     });
+    _loadAvailableTimes();
   }
 
   Widget _buildAdditionalModalitiesContainer() {
@@ -143,7 +145,7 @@ class _ReservePageState extends State<ReservePage> with Messages<ReservePage> {
                   vertical: 8,
                 ),
                 decoration: BoxDecoration(
-                  color: context.colors.secondary.withOpacity(0.1),
+                  color: context.colors.secondary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Row(
@@ -347,7 +349,7 @@ class _ReservePageState extends State<ReservePage> with Messages<ReservePage> {
               _dateController.selectedDate!.fillHourAndMinute(hour, minute),
             );
             Modular.to.popUntil(
-              ModalRoute.withName('/home/'),
+              ModalRoute.withName('/home'),
             ); // Atualiza a lista de horários disponíveis
             setState(() {}); // Atualiza a interface
           },
@@ -360,7 +362,6 @@ class _ReservePageState extends State<ReservePage> with Messages<ReservePage> {
       },
       builder:
           (context, state) => Scaffold(
-        resizeToAvoidBottomInset: false,
         appBar: AppBar(
           title: Image.asset('assets/images/dark_logo.png', height: 32),
           automaticallyImplyLeading: false,

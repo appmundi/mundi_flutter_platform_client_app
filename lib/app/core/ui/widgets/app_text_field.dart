@@ -1,6 +1,7 @@
 import 'package:blurrycontainer/blurrycontainer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/colors_app.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/text_styles.dart';
 
 class AppTextField extends StatefulWidget {
@@ -35,13 +36,11 @@ class _AppTextFieldState extends State<AppTextField> {
           widget.label,
           style: context.textStyles.titleBold.copyWith(
             fontSize: 14.33,
-            color: const Color.fromRGBO(164, 164, 164, 1),
+            color: context.colors.mutedText,
             fontWeight: FontWeight.w300,
           ),
         ),
-        const SizedBox(
-          height: 10,
-        ),
+        const SizedBox(height: 10),
         BlurryContainer(
           blur: 20,
           padding: EdgeInsets.zero,
@@ -55,23 +54,19 @@ class _AppTextFieldState extends State<AppTextField> {
               gradient: LinearGradient(
                 begin: Alignment.topRight,
                 end: Alignment.bottomLeft,
-                stops: const [
-                  0.1,
-                  .9,
-                ],
+                stops: const [0.1, .9],
                 colors: [
                   Colors.transparent,
-                  Colors.white.withOpacity(.2),
+                  Colors.white.withValues(alpha: .2),
                 ],
               ),
-              border: Border.all(
-                color: Colors.white,
-                width: .5,
-              ),
+              border: Border.all(color: Colors.white, width: .5),
             ),
             child: TextFormField(
               validator: widget.validator,
-              scrollPadding: EdgeInsets.zero,
+              scrollPadding: EdgeInsets.only(
+                bottom: MediaQuery.viewInsetsOf(context).bottom + 24,
+              ),
               textAlignVertical: TextAlignVertical.center,
               controller: widget.controller,
               obscureText: widget.obscureText,
@@ -82,10 +77,10 @@ class _AppTextFieldState extends State<AppTextField> {
               decoration: InputDecoration(
                 hintText: widget.hintText,
                 hintStyle: context.textStyles.textRegular.copyWith(
-                  color: Colors.white.withOpacity(.32),
+                  color: Colors.white.withValues(alpha: .32),
                 ),
                 focusedBorder: InputBorder.none,
-              )
+              ),
             ),
           ),
         ),

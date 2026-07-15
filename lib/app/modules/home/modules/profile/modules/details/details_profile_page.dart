@@ -145,12 +145,12 @@ class _DetailsPageState extends State<DetailsProfilePage>
             decoration: BoxDecoration(
               shape: BoxShape.circle,
               border: Border.all(
-                color: Colors.white.withOpacity(0.3),
+                color: Colors.white.withValues(alpha: 0.3),
                 width: 2,
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.2),
+                  color: Colors.black.withValues(alpha: 0.2),
                   blurRadius: 10,
                   offset: const Offset(0, 5),
                 ),
@@ -199,7 +199,7 @@ class _DetailsPageState extends State<DetailsProfilePage>
                         onTap: _showImageOptionsModal,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: Colors.black.withOpacity(0.3),
+                            color: Colors.black.withValues(alpha: 0.3),
                             shape: BoxShape.circle,
                           ),
                           child: Icon(
@@ -219,7 +219,7 @@ class _DetailsPageState extends State<DetailsProfilePage>
           Text(
             'Toque para alterar a foto',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.7),
+              color: Colors.white.withValues(alpha: 0.7),
               fontSize: screenWidth < 360 ? 12 : 14,
             ),
           ),
@@ -227,7 +227,7 @@ class _DetailsPageState extends State<DetailsProfilePage>
           Text(
             'Máximo 2MB',
             style: TextStyle(
-              color: Colors.white.withOpacity(0.5),
+              color: Colors.white.withValues(alpha: 0.5),
               fontSize: screenWidth < 360 ? 11 : 12,
             ),
           ),
@@ -272,7 +272,7 @@ class _DetailsPageState extends State<DetailsProfilePage>
 
           if(state.status == DetailsProfileStatus.updated) {
             showSuccess("Alterado com Sucesso !");
-            Modular.to.navigate('/home/');
+            Modular.to.navigate('/home');
           }
         },
         builder: (context, state) {

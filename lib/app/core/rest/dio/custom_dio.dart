@@ -10,7 +10,7 @@ class CustomDio implements RestClient {
   final LocalStorage localStorage;
 
   final _defaultOptions = BaseOptions(
-    baseUrl: Environments.get("BASE_URL") ?? '',
+    baseUrl: Environments.get('BASE_URL') ?? '',
     connectTimeout: const Duration(milliseconds: 60000),
     receiveTimeout: const Duration(milliseconds: 60000),
     validateStatus: (status) => [401, 200, 201].contains(status),
@@ -18,18 +18,40 @@ class CustomDio implements RestClient {
 
   CustomDio({BaseOptions? baseOptions, required this.localStorage}) {
     _dio = Dio(baseOptions ?? _defaultOptions);
+    _dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          final token = await localStorage.read<String>('accessToken');
+          if (token != null && token.isNotEmpty) {
+            options.headers['Authorization'] = 'Bearer $token';
+          }
+          return handler.next(options);
+        },
+      ),
+    );
+
+    // ===== DEBUG TEMPORÁRIO — interceptor de log (remover antes de produção) =====
+    // Loga método+URL de cada request, o corpo de cada response e erros.
+    // requestBody/requestHeader ficam OFF pra não vazar senha/token no console.
+    _dio.interceptors.add(
+      LogInterceptor(
+        request: true,
+        requestHeader: false,
+        requestBody: false,
+        responseHeader: false,
+        responseBody: true,
+        error: true,
+      ),
+    );
+    // ===========================================================================
   }
 
   @override
-  RestClient auth() {
-    final token = localStorage.read('accessToken');
-    _defaultOptions.headers['Authoriation'] = "Bearer $token";
-    return this;
-  }
+  RestClient auth() => this;
 
   @override
   RestClient unAuth() {
-    _defaultOptions.headers.remove('Authorization');
+    _dio.options.headers.remove('Authorization');
     return this;
   }
 
@@ -38,9 +60,6 @@ class CustomDio implements RestClient {
       {Map<String, dynamic>? queryParameters,
       Map<String, dynamic>? headers}) async {
     try {
-      print(path);
-      print(queryParameters);
-      print(headers);
       final response = await _dio.get(
         path,
         queryParameters: queryParameters,
@@ -58,16 +77,12 @@ class CustomDio implements RestClient {
       Map<String, dynamic>? queryParameters,
       Map<String, dynamic>? headers}) async {
     try {
-      print(_defaultOptions.baseUrl + path);
-      print(data);
-      print(headers);
       final response = await _dio.post(
         path,
         data: data,
         queryParameters: queryParameters,
         options: Options(headers: headers),
       );
-      print(response.data);
       return RestClientResponse<T>.fromDio(response);
     } on DioException catch (e) {
       throw RestClientException.fromDioException(e);
@@ -79,13 +94,15 @@ class CustomDio implements RestClient {
       {data,
       Map<String, dynamic>? queryParameters,
       Map<String, String>? headers}) async {
-    try{
-      final response = await _dio.put(path,
-          data: data,
-          queryParameters: queryParameters,
-          options: Options(headers: headers));
+    try {
+      final response = await _dio.put(
+        path,
+        data: data,
+        queryParameters: queryParameters,
+        options: Options(headers: headers),
+      );
       return RestClientResponse<T>.fromDio(response);
-    }on DioException catch (e) {
+    } on DioException catch (e) {
       throw RestClientException.fromDioException(e);
     }
   }

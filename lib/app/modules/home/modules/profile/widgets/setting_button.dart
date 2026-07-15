@@ -32,7 +32,7 @@ class SettingButton extends StatelessWidget {
         ),
         side: BorderSide(
           color: !isFilled
-              ? Colors.black.withOpacity(.4)
+              ? Colors.black.withValues(alpha: .4)
               : context.colors.secondary,
           width: .5,
         ),
