@@ -5,7 +5,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_material_design_icons/flutter_material_design_icons.dart';
 import 'package:flutter_modular/flutter_modular.dart'
     hide ModularWatchExtension;
-import 'package:geocoding/geocoding.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/storage/local_storage.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/extension/date_time_extension.dart';
@@ -169,106 +168,70 @@ class _SchedulesPageState extends State<SchedulesPage> {
     );
   }
 
-  Future<void> _openSelectedMap(String mapType, double latitude, double longitude) async {
-    String url;
+  Future<void> _openSelectedMap(
+      String mapType, double latitude, double longitude) async {
+    await _launchMapCandidates(
+      mapType,
+      _mapCandidatesForCoordinates(mapType, latitude, longitude),
+    );
+  }
 
+  List<String> _mapCandidatesForCoordinates(
+      String mapType, double latitude, double longitude) {
     switch (mapType) {
       case 'waze':
-        url = 'waze://?ll=$latitude,$longitude&navigate=yes';
-        break;
+        return [
+          'waze://?ll=$latitude,$longitude&navigate=yes',
+          'https://waze.com/ul?ll=$latitude,$longitude&navigate=yes',
+        ];
       case 'google':
-        url = 'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude';
-        break;
+        return [
+          'https://www.google.com/maps/search/?api=1&query=$latitude,$longitude'
+        ];
       case 'apple':
-        url = 'http://maps.apple.com/?ll=$latitude,$longitude';
-        break;
+        return ['http://maps.apple.com/?ll=$latitude,$longitude'];
       default:
-        return;
+        return const [];
+    }
+  }
+
+  List<String> _mapCandidatesForAddress(String mapType, String encoded) {
+    switch (mapType) {
+      case 'waze':
+        return [
+          'waze://?q=$encoded&navigate=yes',
+          'https://waze.com/ul?q=$encoded&navigate=yes',
+        ];
+      case 'google':
+        return ['https://www.google.com/maps/search/?api=1&query=$encoded'];
+      case 'apple':
+        return ['http://maps.apple.com/?q=$encoded'];
+      default:
+        return const [];
+    }
+  }
+
+  Future<void> _launchMapCandidates(
+      String mapType, List<String> candidates) async {
+    for (final candidate in candidates) {
+      try {
+        final launched = await launchUrl(
+          Uri.parse(candidate),
+          mode: LaunchMode.externalApplication,
+        );
+        if (launched) return;
+      } catch (_) {
+        continue;
+      }
     }
 
-    try {
-      final uri = Uri.parse(url);
-      
-      // No iOS, canLaunchUrl não funciona bem para URL schemes customizados
-      // mesmo quando estão no Info.plist. Tentamos abrir diretamente.
-      if (Platform.isIOS) {
-        try {
-          final launched = await launchUrl(
-            uri,
-            mode: LaunchMode.externalApplication,
-          );
-          
-          if (!launched) {
-            // Se não conseguiu abrir e é o Waze, oferece instalar
-            if (mapType == 'waze' && mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: const Text('Waze não está instalado. Abrindo App Store...'),
-                  backgroundColor: Colors.orange,
-                ),
-              );
-              await launchUrl(
-                Uri.parse('https://apps.apple.com/app/id323229106'),
-                mode: LaunchMode.externalApplication,
-              );
-            } else if (mounted) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text('Não foi possível abrir o ${_getMapName(mapType)}.'),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          }
-        } catch (e) {
-          // Se der erro ao tentar abrir Waze, oferece instalar
-          if (mapType == 'waze' && mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: const Text('Waze não está instalado. Abrindo App Store...'),
-                backgroundColor: Colors.orange,
-              ),
-            );
-            await launchUrl(
-              Uri.parse('https://apps.apple.com/app/id323229106'),
-              mode: LaunchMode.externalApplication,
-            );
-          } else if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Erro ao abrir ${_getMapName(mapType)}: ${e.toString()}'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        }
-      } else {
-        // Android: verifica antes de tentar abrir
-        if (await canLaunchUrl(uri)) {
-          await launchUrl(
-            uri,
-            mode: LaunchMode.externalApplication,
-          );
-        } else {
-          if (mounted) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Não foi possível abrir o ${_getMapName(mapType)}. Verifique se está instalado.'),
-                backgroundColor: Colors.red,
-              ),
-            );
-          }
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Erro ao abrir o aplicativo de mapas: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Não foi possível abrir o ${_getMapName(mapType)}.'),
+          backgroundColor: Colors.red,
+        ),
+      );
     }
   }
 
@@ -489,7 +452,7 @@ class _SchedulesPageState extends State<SchedulesPage> {
                                             final fallbackAddr = schedule.entrepreneurAddress.isNotEmpty
                                                 ? schedule.entrepreneurAddress
                                                 : schedule.cep;
-                                            _getCoordinatesFromAddress(fallbackAddr);
+                                            _showMapSelectionDialogByAddress(fallbackAddr);
                                           }
                                         },
                                         label: 'Como chegar',
@@ -543,21 +506,6 @@ class _SchedulesPageState extends State<SchedulesPage> {
     );
   }
 
-  Future<void> _getCoordinatesFromAddress(String address) async {
-    try {
-      List<Location> locations = await locationFromAddress(address);
-      if (locations.isNotEmpty) {
-        final location = locations.first;
-        await _showMapSelectionDialog(location.latitude, location.longitude);
-      } else {
-        await _showMapSelectionDialogByAddress(address);
-      }
-    } catch (e) {
-      print('Error geocoding address: $e');
-      await _showMapSelectionDialogByAddress(address);
-    }
-  }
-
   Future<void> _showMapSelectionDialogByAddress(String address) async {
     final encoded = Uri.encodeComponent(address);
     final selectedOption = await showDialog<String>(
@@ -603,21 +551,9 @@ class _SchedulesPageState extends State<SchedulesPage> {
 
     if (selectedOption == null || !mounted) return;
 
-    final String url;
-    switch (selectedOption) {
-      case 'waze':
-        url = 'waze://?q=$encoded&navigate=yes';
-        break;
-      case 'google':
-        url = 'https://www.google.com/maps/search/?api=1&query=$encoded';
-        break;
-      case 'apple':
-        url = 'http://maps.apple.com/?q=$encoded';
-        break;
-      default:
-        return;
-    }
-
-    await launchUrl(Uri.parse(url), mode: LaunchMode.externalApplication);
+    await _launchMapCandidates(
+      selectedOption,
+      _mapCandidatesForAddress(selectedOption, encoded),
+    );
   }
 }

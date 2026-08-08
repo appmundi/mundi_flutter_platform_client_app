@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/exception/connection_exception.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/location/i_location_service.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/entrepreneur.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/cubit/home_state.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/entrepeneur/i_entrepreneur_repository.dart';
@@ -9,15 +10,25 @@ import '../../../repository/schedule/i_schedule_repository.dart';
 class HomeCubit extends Cubit<HomeState> {
   final IEntrepreneurRepository repository;
   final IScheduleRepository schedulesRepository;
+  final ILocationService locationService;
 
-  HomeCubit({required this.repository, required this.schedulesRepository})
-      : super(const HomeState.initial());
+  HomeCubit({
+    required this.repository,
+    required this.schedulesRepository,
+    required this.locationService,
+  }) : super(const HomeState.initial());
 
   Future<void> loadData() async {
     emit(state.copyWith(status: HomeStateStatus.loading));
     try {
-      final all = await repository.searchAll();
-      final entrepreneurs = all ?? [];
+      final position = await locationService.currentPosition();
+      final result = await repository.nearby(
+        latitude: position?.latitude,
+        longitude: position?.longitude,
+      );
+      if (isClosed) return;
+
+      final entrepreneurs = result.data;
 
       emit(state.copyWith(
         status: HomeStateStatus.loaded,
@@ -25,21 +36,12 @@ class HomeCubit extends Cubit<HomeState> {
         specialOffers: _computeSpecialOffers(entrepreneurs),
         recommended: _computeRecommended(entrepreneurs),
         availableToday: _computeAvailableToday(entrepreneurs),
+        appliedFilter: result.appliedFilter,
+        clientUf: result.clientUf,
       ));
     } on ConnectionException {
+      if (isClosed) return;
       emit(state.copyWith(status: HomeStateStatus.error));
-    }
-  }
-
-  Future<void> applyFilter(String filterText) async {
-    try {
-      emit(state.copyWith(status: HomeStateStatus.loading));
-      final filteredEntrepreneurs = await repository.searchAll(filterText);
-      emit(state.copyWith(
-          filteredEntrepreneurs: filteredEntrepreneurs,
-          status: HomeStateStatus.loaded));
-    } catch (e) {
-      state.copyWith(filteredEntrepreneurs: state.entrepreneurs);
     }
   }
 

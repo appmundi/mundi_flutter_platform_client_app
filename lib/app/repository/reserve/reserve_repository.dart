@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:mundi_flutter_platform_client_app/app/core/exception/invalid_field_exception.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/rest/rest_client_exception.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/storage/local_storage.dart';
+import 'package:mundi_flutter_platform_client_app/app/models/address.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/reserve/i_reserve_repository.dart';
 
 import '../../core/rest/rest_client.dart';
@@ -19,7 +20,7 @@ class ReserveRepository implements IReserveRepository {
     required String scheduledDate,
     required List<int> modalityIds,
     required String description,
-    Map<String, String>? address,
+    Address? address,
   }) async {
     try {
       final response = await rest.post(
@@ -30,7 +31,7 @@ class ReserveRepository implements IReserveRepository {
           "modalityIds": modalityIds,
           "status": "INIT",
           "description": description,
-          "address": address,
+          "address": address?.toReservationPayload(),
         },
         headers: {
           'Content-Type': 'application/json',

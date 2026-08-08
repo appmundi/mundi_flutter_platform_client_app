@@ -3,13 +3,14 @@ import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/rest/rest_client.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/storage/local_storage.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/cubit/home_cubit.dart';
+import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/addresses/addresses_module.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/chat/chat_modular.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/entrepreneur/entrepreneur_module.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/profile/profile_module.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/schedules/cubit/schedules_cubit.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/search/cubit/search_cubit.dart';
-import 'package:mundi_flutter_platform_client_app/app/repository/address/address_repository.dart';
-import 'package:mundi_flutter_platform_client_app/app/repository/address/i_address_repository.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/location/i_location_service.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/location/location_service.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/auth/auth_repository.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/auth/i_auth_repository.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/entrepeneur/entrepreneur_repository.dart';
@@ -36,7 +37,7 @@ class HomeModule extends Module {
     i.addInstance<IEntrepreneurRepository>(
       EntrepreneurRepository(rest: Modular.get<RestClient>()),
     );
-    i.addInstance<IAddressRepository>(AddressRepository());
+    i.addLazySingleton<ILocationService>(() => LocationService());
     i.addInstance<ICategoryRepository>(
       CategoryRepository(rest: Modular.get<RestClient>()),
     );
@@ -55,6 +56,7 @@ class HomeModule extends Module {
                     (context) => HomeCubit(
                       schedulesRepository: Modular.get<IScheduleRepository>(),
                       repository: Modular.get<IEntrepreneurRepository>(),
+                      locationService: Modular.get<ILocationService>(),
                     )..loadData(),
               ),
               BlocProvider(
@@ -67,7 +69,7 @@ class HomeModule extends Module {
                 create:
                     (context) => SearchCubit(
                       repository: Modular.get<IEntrepreneurRepository>(),
-                      addressRepository: Modular.get<IAddressRepository>(),
+                      locationService: Modular.get<ILocationService>(),
                     )..loadData(),
               ),
             ],
@@ -77,5 +79,6 @@ class HomeModule extends Module {
     r.module('/entrepreneur', module: EntrepreneurModule());
     r.module('/chat', module: ChatModule());
     r.module("/profile", module: ProfileModule());
+    r.module('/addresses', module: AddressesModule());
   }
 }

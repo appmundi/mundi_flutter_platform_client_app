@@ -51,7 +51,7 @@ class _HorizontalEntrepreneursListState extends State<HorizontalEntrepreneursLis
             },
             scrollDirection: Axis.horizontal,
             shrinkWrap: true,
-            itemCount: widget.entrepeneurs.length,
+            itemCount: widget.isLoading ? 3 : widget.entrepeneurs.length,
             itemBuilder: (context, index) {
               if(widget.isLoading) {
                 return const EntrepreneurTile.loading();

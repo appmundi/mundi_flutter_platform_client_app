@@ -1,5 +1,6 @@
 import 'package:bloc/bloc.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/exception/invalid_field_exception.dart';
+import 'package:mundi_flutter_platform_client_app/app/models/address.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/entrepreneur/modules/reserve/cubit/reserve_state.dart';
 
 import '../../../../../../../repository/reserve/i_reserve_repository.dart';
@@ -15,7 +16,7 @@ class ReserveCubit extends Cubit<ReserveState> {
     required String scheduledDate,
     required List<int> modalityIds,
     required String description,
-    Map<String, String>? address,
+    Address? address,
   }) async {
     try {
       emit(state.copyWith(status: ReserveStatus.loading));
