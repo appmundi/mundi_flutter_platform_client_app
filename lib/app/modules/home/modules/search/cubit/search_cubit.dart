@@ -1,14 +1,15 @@
 import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/exception/connection_exception.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/location/i_location_service.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/search/cubit/search_state.dart';
-import 'package:mundi_flutter_platform_client_app/app/repository/address/i_address_repository.dart';
+import 'package:mundi_flutter_platform_client_app/app/repository/entrepeneur/entrepreneur_search_result.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/entrepeneur/i_entrepreneur_repository.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/entrepreneur.dart';
 
 class SearchCubit extends Cubit<SearchState> {
   final IEntrepreneurRepository repository;
-  final IAddressRepository addressRepository;
+  final ILocationService locationService;
 
   List<Entrepreneur>? _originalEntrepreneurs; // Dados originais (nunca muda)
   List<Entrepreneur>? _currentEntrepreneurs; // Dados após busca por texto
@@ -17,51 +18,67 @@ class SearchCubit extends Cubit<SearchState> {
   List<int>? _activeSpecialtyIds;
   double? _activeMaxDistance;
   double? _activeMinRating;
+  String? _lastQuery;
 
-  SearchCubit({required this.repository, required this.addressRepository})
+  SearchCubit({required this.repository, required this.locationService})
     : super(const SearchState.initial());
+
+  Future<EntrepreneurSearchResult> _search([String? query]) async {
+    _lastQuery = query;
+    final position = await locationService.currentPosition();
+    return repository.nearby(
+      query: query,
+      latitude: position?.latitude,
+      longitude: position?.longitude,
+    );
+  }
+
+  Future<void> refresh() =>
+      (_lastQuery?.isNotEmpty ?? false) ? applyFilter(_lastQuery!) : loadData();
 
   Future<void> loadData() async {
     emit(state.copyWith(status: SearchStateStatus.loading));
     try {
-      List<Entrepreneur>? entrepreneurs = await repository.searchAll();
-      entrepreneurs = await _insertDistance(entrepreneurs ?? []);
-      _originalEntrepreneurs = entrepreneurs;
-      _currentEntrepreneurs = entrepreneurs;
+      final result = await _search();
+      if (isClosed) return;
+
+      _originalEntrepreneurs = result.data;
+      _currentEntrepreneurs = result.data;
 
       emit(
         state.copyWith(
           status: SearchStateStatus.loaded,
-          entrepreneurs: entrepreneurs,
+          entrepreneurs: result.data,
+          appliedFilter: result.appliedFilter,
+          clientUf: result.clientUf,
         ),
       );
     } on ConnectionException {
+      if (isClosed) return;
       emit(state.copyWith(status: SearchStateStatus.error));
     }
-  }
-
-  Future<List<Entrepreneur>> _insertDistance(List<Entrepreneur> entrepreneurs) async {
-    final result = await addressRepository.calculateDistante(
-      entrepreneurs ?? [],
-    );
-
-    return result;
   }
 
   Future<void> applyFilter(String filterText) async {
     try {
       emit(state.copyWith(status: SearchStateStatus.loading));
 
-      final filteredEntrepreneurs = await repository.searchAll(filterText);
-      _currentEntrepreneurs = filteredEntrepreneurs;
+      final result = await _search(filterText);
+      if (isClosed) return;
 
-      final result = _applyAdvancedFiltersToList(_currentEntrepreneurs!);
+      _currentEntrepreneurs = result.data;
 
       emit(
-        state.copyWith(entrepreneurs: result, status: SearchStateStatus.loaded),
+        state.copyWith(
+          entrepreneurs: _applyAdvancedFiltersToList(_currentEntrepreneurs!),
+          status: SearchStateStatus.loaded,
+          appliedFilter: result.appliedFilter,
+          clientUf: result.clientUf,
+        ),
       );
     } catch (e) {
       log('Erro ao aplicar filtro de texto: $e');
+      if (isClosed) return;
       emit(
         state.copyWith(
           entrepreneurs: state.entrepreneurs,
@@ -182,3 +199,4 @@ class SearchCubit extends Cubit<SearchState> {
         (_activeMinRating != null && _activeMinRating! > 0);
   }
 }
+

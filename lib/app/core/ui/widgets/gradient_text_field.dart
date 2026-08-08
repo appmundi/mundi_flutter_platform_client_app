@@ -60,9 +60,7 @@ class _GradientTextFieldState extends State<GradientTextField> {
         maxLines: 1,
         textInputAction: TextInputAction.search,
         onSubmitted: widget.onSubmitted,
-        onChanged: (string){
-          widget.function!(string);
-        },
+        onChanged: (string) => widget.function?.call(string),
         scrollPadding: EdgeInsets.zero,
         textAlignVertical: TextAlignVertical.center,
         style: context.textStyles.textRegular.copyWith(

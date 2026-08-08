@@ -1,7 +1,8 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_modular/flutter_modular.dart';
-import 'package:mundi_flutter_platform_client_app/app/core/helpers/environments.dart';
-import 'package:mundi_flutter_platform_client_app/app/core/rest/http/http_rest_client.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/rest/rest_client.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/copy/status_copy.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/extension/date_time_extension.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/colors_app.dart';
@@ -198,11 +199,15 @@ class _ModalContent extends StatelessWidget {
 
   Future<void> _cancelSchedule(BuildContext context) async {
     try {
-      final repo = ScheduleRepository(
-        rest: HttpRestClient(baseUrl: Environments.get('BASE_URL') ?? ''),
-      );
+      final repo = ScheduleRepository(rest: Modular.get<RestClient>());
       await repo.cancelSchedule(reservation.scheduleId);
-    } catch (_) {
+    } catch (e, s) {
+      log(
+        'Falha ao cancelar agendamento ${reservation.scheduleId}',
+        name: 'MoreInfoModal',
+        error: e,
+        stackTrace: s,
+      );
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(

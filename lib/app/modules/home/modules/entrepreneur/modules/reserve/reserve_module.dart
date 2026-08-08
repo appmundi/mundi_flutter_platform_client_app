@@ -5,6 +5,8 @@ import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/entre
 import 'package:mundi_flutter_platform_client_app/app/modules/home/modules/entrepreneur/modules/reserve/reserve_page.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/reserve/i_reserve_repository.dart';
 import 'package:mundi_flutter_platform_client_app/app/repository/reserve/reserve_repository.dart';
+import 'package:mundi_flutter_platform_client_app/app/repository/user_address/i_user_address_repository.dart';
+import 'package:mundi_flutter_platform_client_app/app/repository/user_address/user_address_repository.dart';
 
 import '../../../../../../core/rest/rest_client.dart';
 
@@ -15,6 +17,14 @@ class ReserveModule extends Module {
       ReserveRepository(
         rest: Modular.get<RestClient>(),
         localStorage: Modular.get<LocalStorage>()
+      ),
+    );
+    // A tela de reserva pré-carrega o endereço salvo mais recente pra
+    // sugerir como padrão (ver ReservePage._loadDefaultAddress).
+    i.addInstance<IUserAddressRepository>(
+      UserAddressRepository(
+        rest: Modular.get<RestClient>(),
+        localStorage: Modular.get<LocalStorage>(),
       ),
     );
   }

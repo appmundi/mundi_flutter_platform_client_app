@@ -117,6 +117,16 @@ class _EntrepreneurTileState extends State<EntrepreneurTile> {
             height: 1.35,
           ),
         ),
+        if (widget.entrepreneur!.distance != null) ...[
+          const SizedBox(height: 5),
+          Text(
+            "${widget.entrepreneur!.distance!.toStringAsFixed(1)} km",
+            style: context.textStyles.textRegular.copyWith(
+              fontSize: 10,
+              color: const Color(0xFFA4A4A4),
+            ),
+          ),
+        ],
       ],
     );
   }

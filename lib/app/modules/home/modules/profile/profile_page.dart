@@ -71,6 +71,16 @@ class _ProfilePageState extends State<ProfilePage> {
               },
             ),
             const SizedBox(height: 10),
+            SettingButton(
+              label: 'Meus Endereços',
+              onPressed: () {
+                Modular.to.pushNamed(
+                  '/home/addresses',
+                  arguments: {'selectMode': false},
+                );
+              },
+            ),
+            const SizedBox(height: 10),
             SettingButton.filled(
               label: 'Notificações',
               onPressed: () {
