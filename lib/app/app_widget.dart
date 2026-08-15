@@ -25,11 +25,17 @@ class _AppWidgetState extends State<AppWidget> {
       DeepLinkService().init();
       NotificationService.instance.registerListeners();
 
-      // Handle cold-start notification tap before anything else
-      final action = await AwesomeNotifications()
-          .getInitialNotificationAction(removeFromActionEvents: true);
-      if (action != null) {
-        await Modular.get<HandleNotificationTapUseCase>().execute(action);
+      // Handle cold-start notification tap before anything else. Guarded on its
+      // own: a throw here must not stop the permission request below from
+      // being scheduled.
+      try {
+        final action = await AwesomeNotifications()
+            .getInitialNotificationAction(removeFromActionEvents: true);
+        if (action != null) {
+          await Modular.get<HandleNotificationTapUseCase>().execute(action);
+        }
+      } catch (e) {
+        debugPrint('Initial notification action failed: $e');
       }
 
       // Delayed 3s so the user sees the app before the permission dialog.
