@@ -1,0 +1,2 @@
+# Scripts de CI precisam de LF: CRLF quebra no macOS com "bad interpreter: /bin/sh^M"
+*.sh text eol=lf

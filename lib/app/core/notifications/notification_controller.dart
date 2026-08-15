@@ -1,5 +1,6 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
+import 'package:flutter_modular/flutter_modular.dart';
 import 'package:get_it/get_it.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/notifications/use_cases/handle_notification_tap_use_case.dart';
 import 'package:mundi_flutter_platform_client_app/app/modules/notifications/use_cases/register_fcm_token_use_case.dart';
@@ -53,6 +54,16 @@ class NotificationController {
   @pragma('vm:entry-point')
   static Future<void> fcmTokenHandle(String token) async {
     NotificationBackgroundDI.setup();
-    await GetIt.I<RegisterFcmTokenUseCase>().storeToken(token);
+    // The plugin dispatches this over its method channel, so it normally lands
+    // on the main isolate where the Modular-bound use case (the one carrying
+    // the repository) can POST the token. The get_it instance is the fallback
+    // for a background isolate, where it only persists locally.
+    RegisterFcmTokenUseCase? useCase;
+    try {
+      useCase = Modular.tryGet<RegisterFcmTokenUseCase>();
+    } catch (_) {
+      useCase = null;
+    }
+    await (useCase ?? GetIt.I<RegisterFcmTokenUseCase>()).storeToken(token);
   }
 }

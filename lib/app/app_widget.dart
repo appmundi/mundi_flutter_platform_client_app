@@ -32,14 +32,21 @@ class _AppWidgetState extends State<AppWidget> {
         await Modular.get<HandleNotificationTapUseCase>().execute(action);
       }
 
+      // Delayed 3s so the user sees the app before the permission dialog.
+      Future.delayed(const Duration(seconds: 3), _bootstrapPush);
+    });
+  }
+
+  /// Permission has to come first: on iOS the FCM token is only minted after
+  /// the APNs registration that follows the user granting it.
+  Future<void> _bootstrapPush() async {
+    try {
+      await NotificationService.instance.ensurePermission();
       await Modular.get<RegisterFcmTokenUseCase>().run();
       await NotificationService.instance.subscribeToTopic('marketing_general');
-
-      // Request permission after 3s so user sees the app first
-      Future.delayed(const Duration(seconds: 3), () async {
-        await NotificationService.instance.ensurePermission();
-      });
-    });
+    } catch (e) {
+      debugPrint('Push bootstrap failed: $e');
+    }
   }
 
   @override

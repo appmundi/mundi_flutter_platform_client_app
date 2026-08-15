@@ -108,8 +108,12 @@ class NotificationService {
 
   Future<void> cancelById(int id) => AwesomeNotifications().cancel(id);
 
-  Future<String?> currentFcmToken() =>
-      AwesomeNotificationsFcm().requestFirebaseAppToken();
+  /// The plugin returns '' (never null) when no token is available yet, so
+  /// normalize it to null for callers.
+  Future<String?> currentFcmToken() async {
+    final token = await AwesomeNotificationsFcm().requestFirebaseAppToken();
+    return token.isEmpty ? null : token;
+  }
 
   Future<void> subscribeToTopic(String topic) =>
       AwesomeNotificationsFcm().subscribeToTopic(topic);

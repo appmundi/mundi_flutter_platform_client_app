@@ -33,9 +33,13 @@ class _LoginPageState extends State<LoginPage> with Messages<LoginPage> {
   /// After a successful login the access token exists, so we can register the
   /// FCM token with the backend and ask for notification permission. Runs
   /// fire-and-forget so it never blocks navigation.
-  void _registerPushAfterLogin() {
-    Modular.get<RegisterFcmTokenUseCase>().run();
-    NotificationService.instance.ensurePermission();
+  Future<void> _registerPushAfterLogin() async {
+    try {
+      await NotificationService.instance.ensurePermission();
+      await Modular.get<RegisterFcmTokenUseCase>().run();
+    } catch (e) {
+      debugPrint('Push registration after login failed: $e');
+    }
   }
 
   @override
