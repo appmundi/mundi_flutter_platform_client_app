@@ -1,6 +1,7 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:awesome_notifications_fcm/awesome_notifications_fcm.dart';
 import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'channels.dart';
 import 'notification_controller.dart';
@@ -113,6 +114,22 @@ class NotificationService {
   Future<String?> currentFcmToken() async {
     final token = await AwesomeNotificationsFcm().requestFirebaseAppToken();
     return token.isEmpty ? null : token;
+  }
+
+  /// Aplica a preferência salva de marketing ao tópico. Chamado a cada abertura
+  /// do app: antes o boot reinscrevia incondicionalmente, o que desfazia o
+  /// opt-out do usuário na abertura seguinte.
+  Future<void> syncMarketingSubscription() async {
+    final sp = await SharedPreferences.getInstance();
+    final enabled = sp.getBool(NotificationPrefs.marketingEnabled) ?? true;
+
+    await unsubscribeFromTopic(AppChannels.legacyMarketingTopic);
+
+    if (enabled) {
+      await subscribeToTopic(AppChannels.marketingTopic);
+    } else {
+      await unsubscribeFromTopic(AppChannels.marketingTopic);
+    }
   }
 
   Future<void> subscribeToTopic(String topic) =>

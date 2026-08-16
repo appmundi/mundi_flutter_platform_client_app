@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_modular/flutter_modular.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/helpers/environments.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/ui/extension/ratings_extension.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/colors_app.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/text_styles.dart';
 import 'package:mundi_flutter_platform_client_app/app/models/entrepreneur.dart';
@@ -243,11 +244,20 @@ class _EntrepreneurPageState extends State<EntrepreneurPage>
                                   const SizedBox(width: 5),
                                   Text(
                                     calculateStars(entrepreneur.ratings ?? [])
-                                        .toString(),
+                                        .ratingLabel,
                                     style:
                                         context.textStyles.textMedium.copyWith(
                                       fontSize: 16,
                                       color: context.colors.decorationPrimary,
+                                    ),
+                                  ),
+                                  Text(
+                                    '/5',
+                                    style:
+                                        context.textStyles.textMedium.copyWith(
+                                      fontSize: 12,
+                                      color: context.colors.decorationPrimary
+                                          .withValues(alpha: 0.6),
                                     ),
                                   ),
                                 ],

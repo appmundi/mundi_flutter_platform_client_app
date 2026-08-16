@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:mundi_flutter_platform_client_app/app/core/ui/extension/ratings_extension.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/colors_app.dart';
 import 'package:mundi_flutter_platform_client_app/app/core/ui/styles/text_styles.dart';
 // ignore: depend_on_referenced_packages
@@ -53,10 +54,17 @@ class _RatingPageState extends State<RatingPage> {
                           width: 5,
                         ),
                         Text(
-                          widget.stars?.toStringAsFixed(2) ?? '0.0',
+                          (widget.stars ?? 0.0).ratingLabel,
                           style: context.textStyles.textMedium.copyWith(
                             fontSize: 28,
                             color: const Color.fromRGBO(62, 62, 62, 1),
+                          ),
+                        ),
+                        Text(
+                          '/5',
+                          style: context.textStyles.textMedium.copyWith(
+                            fontSize: 18,
+                            color: const Color.fromRGBO(62, 62, 62, 0.6),
                           ),
                         )
                       ],

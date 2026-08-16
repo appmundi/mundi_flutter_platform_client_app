@@ -1,7 +1,20 @@
 import 'package:awesome_notifications/awesome_notifications.dart';
 import 'package:flutter/material.dart';
 
+abstract class NotificationPrefs {
+  static const String marketingEnabled = '_notif_marketing';
+}
+
 abstract class AppChannels {
+  /// Tópico de marketing deste app. Separado por público para que a campanha
+  /// consiga segmentar cliente x empreendedor e ainda assim respeitar o opt-out,
+  /// que só funciona quando o alvo é tópico e não o app inteiro.
+  static const String marketingTopic = 'marketing_clients';
+
+  /// Tópico único usado até a separação por público. Mantido só para
+  /// desinscrever quem já estava nele.
+  static const String legacyMarketingTopic = 'marketing_general';
+
   static const String transactionalGroupKey = 'transactional';
   static const String marketingGroupKey = 'marketing';
 

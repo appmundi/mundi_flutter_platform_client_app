@@ -201,7 +201,7 @@ class _ResultTileState extends State<ResultTile> {
                 ),
                 const SizedBox(width: 5),
                 Text(
-                  '${widget.entrepreneur?.ratings?.media ?? 0}',
+                  (widget.entrepreneur?.ratings?.media ?? 0.0).ratingLabel,
                   style: context.textStyles.textMedium.copyWith(
                     color: context.colors.decorationPrimary,
                     fontSize: 14,

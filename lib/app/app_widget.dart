@@ -49,7 +49,7 @@ class _AppWidgetState extends State<AppWidget> {
     try {
       await NotificationService.instance.ensurePermission();
       await Modular.get<RegisterFcmTokenUseCase>().run();
-      await NotificationService.instance.subscribeToTopic('marketing_general');
+      await NotificationService.instance.syncMarketingSubscription();
     } catch (e) {
       debugPrint('Push bootstrap failed: $e');
     }
